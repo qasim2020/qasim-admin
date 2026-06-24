@@ -1,0 +1,38 @@
+<!-- Page header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-end">
+            <div class="col">
+                <!-- Page pre-title -->
+                <div class="page-pretitle">
+                    Dashboard
+                </div>
+                <h2 class="page-title">
+                    iLearningHubb Admin Portal
+                </h2>
+            </div>
+            <div class="col-auto" id="dash-view-toggle">
+                <button class="badge cursor-pointer p-2 mb-1 bg-blue-lt" data-c-target="#dashboard-hero-container"
+                    onclick="toggleDashView(this)">Analytics</button>
+                <button class="badge cursor-pointer p-2 mb-1 bg-blue-lt" data-c-target="#activity-container"
+                    onclick="toggleDashView(this)">Recent Activity</button>
+                <button class="badge cursor-pointer p-2 mb-1 bg-blue-lt" data-c-target="#journey-container"
+                    onclick="toggleDashView(this)">Customer Journey</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+
+    <div class="container-xl">
+        <div class="row row-deck row-cards" id="dashboard-hero-container">
+        </div>
+        <div class="row row-deck row-cards mt-1">
+            <div class="col-lg-6" id="activity-container">
+            </div>
+            <div class="col-lg-6" id="journey-container">
+            </div>
+        </div>
+    </div>
+</div>
