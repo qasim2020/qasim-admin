@@ -1,11 +1,10 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const handlebars = require('handlebars');
-const fs = require('fs').promises;
-const path = require('path');
-
-const { isValidEmail } = require('../modules/checkValidForm');
+const Blog = require('../models/Blog');
+const Project = require('../models/Project');
+const Subscriber = require('../models/Subscriber');
+const Newsletter = require('../models/Newsletter');
+const WorkExperience = require('../models/WorkExperience');
+const Skill = require('../models/Skill');
+const Testimonial = require('../models/Testimonial');
 
 exports.toggleSideBar = async (req, res) => {
     req.session.sidebarCollapsed = req.body.sidebarCollapsed;
@@ -18,10 +17,37 @@ exports.toggleSideBar = async (req, res) => {
 
 exports.getDashboard = async (req, res) => {
     try {
+        const [
+            blogTotal, blogPublished,
+            projectTotal, projectPublished,
+            subscriberTotal, subscriberActive,
+            newsletterTotal, newsletterSent,
+            workExpTotal, skillTotal, testimonialTotal,
+        ] = await Promise.all([
+            Blog.countDocuments(),
+            Blog.countDocuments({ status: 'published' }),
+            Project.countDocuments(),
+            Project.countDocuments({ status: 'published' }),
+            Subscriber.countDocuments(),
+            Subscriber.countDocuments({ status: 'active' }),
+            Newsletter.countDocuments(),
+            Newsletter.countDocuments({ status: 'sent' }),
+            WorkExperience.countDocuments(),
+            Skill.countDocuments(),
+            Testimonial.countDocuments(),
+        ]);
+
         res.render('home', {
             userId: req.session.userId,
             userName: req.session.name,
-            sidebarCollapsed: req.session.sidebarCollapsed ? req.session.sidebarCollapsed : false,
+            sidebarCollapsed: req.session.sidebarCollapsed || false,
+            stats: {
+                blogTotal, blogPublished,
+                projectTotal, projectPublished,
+                subscriberTotal, subscriberActive,
+                newsletterTotal, newsletterSent,
+                workExpTotal, skillTotal, testimonialTotal,
+            },
         });
     } catch (error) {
         console.log(error);

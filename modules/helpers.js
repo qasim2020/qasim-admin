@@ -183,6 +183,41 @@ const json = function (value) {
     return JSON.stringify(value);
 };
 
+/**
+ * Strip HTML tags and return plain-text preview of the requested length.
+ */
+const blogPreview = function (content, lengthOrOptions) {
+    const maxLen = typeof lengthOrOptions === 'number' ? lengthOrOptions : 160;
+    if (!content) return '';
+    const plain = content
+        .replace(/<[^>]+>/g, ' ')        // strip tags
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&[a-z]+;/gi, ' ')      // remaining entities
+        .replace(/\s+/g, ' ')
+        .trim();
+    return plain.length <= maxLen ? plain : plain.substring(0, maxLen).trimEnd() + '…';
+};
+
+/**
+ * Extract the title from the first <h1> tag in HTML content.
+ * Falls back to the first non-empty stripped text.
+ */
+const extractH1 = function (content) {
+    if (!content) return 'Untitled';
+    const m = content.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    if (m) return m[1].replace(/<[^>]+>/g, '').trim() || 'Untitled';
+    const stripped = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    return stripped.slice(0, 100).split(/[.!?]/)[0].trim() || 'Untitled';
+};
+
+const percentage = function (part, total) {
+    if (!total || total === 0) return 0;
+    return Math.round((part / total) * 100);
+};
+
 const expiresOn = (createdAt, months) => {
     if (!createdAt || !months || months <= 0) {
         throw new Error('Invalid input: createdAt and months must be valid');
@@ -221,4 +256,7 @@ module.exports = {
     startsWith,
     lte,
     includes,
+    percentage,
+    blogPreview,
+    extractH1,
 };

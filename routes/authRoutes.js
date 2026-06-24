@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/authController');
+const authController = require('../controllers/authController');
 
-router.get('/login', userController.renderLoginPage);
-router.post('/send-magic-link', userController.sendMagicLink);
-router.get('/auth-magic-link', userController.testMagicLink);
-router.get('/logout', userController.logout);
+router.get('/login', authController.renderLoginPage);
+router.post('/login', authController.login);
+
+router.get('/forgot-password', authController.renderForgotPasswordPage);
+router.post('/forgot-password', authController.forgotPassword);
+
+router.get('/reset-password', authController.renderResetPasswordPage);
+router.post('/reset-password', authController.resetPassword);
+
+router.get('/logout', authController.logout);
 
 module.exports = router;

@@ -1,0 +1,222 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Categories</h2>
+                <div class="text-secondary mt-1">{{items.length}} categor{{#if (eq items.length 1)}}y{{else}}ies{{/if}}</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <button class="btn btn-primary" onclick="openNew()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" />
+                        <path d="M5 12l14 0" />
+                    </svg>
+                    New Category
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            {{#if items.length}}
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Slug</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td class="fw-medium">{{this.name}}</td>
+                            <td class="text-secondary"><code>{{this.slug}}</code></td>
+                            <td>
+                                {{#if (eq this.type 'blog')}}
+                                <span class="badge bg-blue-lt">Blog</span>
+                                {{else if (eq this.type 'project')}}
+                                <span class="badge bg-green-lt">Project</span>
+                                {{else}}
+                                <span class="badge bg-purple-lt">Both</span>
+                                {{/if}}
+                            </td>
+                            <td class="text-secondary">{{this.description}}</td>
+                            <td>
+                                <div class="btn-list flex-nowrap">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="editItem('{{this._id}}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        onclick="deleteItem('{{this._id}}', '{{this.name}}')">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <div class="card-body">
+                <div class="empty">
+                    <p class="empty-title">No categories yet</p>
+                    <p class="empty-subtitle text-secondary">Add categories to group your content.</p>
+                    <div class="empty-action">
+                        <button class="btn btn-primary" onclick="openNew()">Add first category</button>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="item-form" onsubmit="submitForm(event)">
+                <input type="hidden" id="item-id">
+                <div class="modal-body">
+                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                    <div class="row g-3">
+                        <div class="col-8">
+                            <label class="form-label required">Name</label>
+                            <input type="text" id="field-name" class="form-control" placeholder="e.g. Web Development"
+                                required>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Type</label>
+                            <select id="field-type" class="form-select">
+                                <option value="both">Both</option>
+                                <option value="blog">Blog</option>
+                                <option value="project">Project</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Slug <span class="text-secondary">(auto-generated)</span></label>
+                            <input type="text" id="field-slug" class="form-control"
+                                placeholder="web-development">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea id="field-description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = '/categories';
+
+    function slugify(str) {
+        return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    document.getElementById('field-name').addEventListener('input', function () {
+        const slugField = document.getElementById('field-slug');
+        if (!slugField.dataset.manual) slugField.value = slugify(this.value);
+    });
+
+    document.getElementById('field-slug').addEventListener('input', function () {
+        this.dataset.manual = this.value ? 'true' : '';
+    });
+
+    function openNew() {
+        document.getElementById('modal-title').textContent = 'New Category';
+        document.getElementById('item-id').value = '';
+        document.getElementById('item-form').reset();
+        document.getElementById('field-slug').dataset.manual = '';
+        document.getElementById('form-error').classList.add('d-none');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    }
+
+    async function editItem(id) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`);
+            const data = await res.json();
+            document.getElementById('modal-title').textContent = 'Edit Category';
+            document.getElementById('item-id').value = data._id;
+            document.getElementById('field-name').value = data.name || '';
+            document.getElementById('field-slug').value = data.slug || '';
+            document.getElementById('field-slug').dataset.manual = 'true';
+            document.getElementById('field-type').value = data.type || 'both';
+            document.getElementById('field-description').value = data.description || '';
+            document.getElementById('form-error').classList.add('d-none');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+        } catch (err) {
+            alert('Failed to load category data.');
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('item-id').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${BASE_URL}/${id}` : BASE_URL;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+        try {
+            const payload = {
+                name: document.getElementById('field-name').value.trim(),
+                slug: document.getElementById('field-slug').value.trim(),
+                type: document.getElementById('field-type').value,
+                description: document.getElementById('field-description').value.trim(),
+            };
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'An error occurred');
+            }
+        } catch (err) {
+            showError('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save';
+        }
+    }
+
+    async function deleteItem(id, name) {
+        if (!confirm(`Delete category "${name}"? This cannot be undone.`)) return;
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Delete failed');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+    }
+</script>

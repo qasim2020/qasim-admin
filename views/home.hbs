@@ -1,38 +1,152 @@
 <!-- Page header -->
 <div class="page-header d-print-none">
     <div class="container-xl">
-        <div class="row g-2 align-items-end">
+        <div class="row g-2 align-items-center">
             <div class="col">
-                <!-- Page pre-title -->
-                <div class="page-pretitle">
-                    Dashboard
-                </div>
-                <h2 class="page-title">
-                    iLearningHubb Admin Portal
-                </h2>
-            </div>
-            <div class="col-auto" id="dash-view-toggle">
-                <button class="badge cursor-pointer p-2 mb-1 bg-blue-lt" data-c-target="#dashboard-hero-container"
-                    onclick="toggleDashView(this)">Analytics</button>
-                <button class="badge cursor-pointer p-2 mb-1 bg-blue-lt" data-c-target="#activity-container"
-                    onclick="toggleDashView(this)">Recent Activity</button>
-                <button class="badge cursor-pointer p-2 mb-1 bg-blue-lt" data-c-target="#journey-container"
-                    onclick="toggleDashView(this)">Customer Journey</button>
+                <div class="page-pretitle">Overview</div>
+                <h2 class="page-title">Dashboard</h2>
             </div>
         </div>
     </div>
 </div>
 
 <div class="page-body">
-
     <div class="container-xl">
-        <div class="row row-deck row-cards" id="dashboard-hero-container">
-        </div>
-        <div class="row row-deck row-cards mt-1">
-            <div class="col-lg-6" id="activity-container">
+
+        <!-- Content Stats -->
+        <div class="row row-deck row-cards mb-3">
+
+            <!-- Blog Posts -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="subheader mb-2">Blog Posts</div>
+                        <div class="h1 mb-3">{{stats.blogTotal}}</div>
+                        <div class="d-flex mb-2">
+                            <div>{{stats.blogPublished}} published</div>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-blue" style="width: {{#if stats.blogTotal}}{{percentage stats.blogPublished stats.blogTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><a href="/blog" class="btn btn-sm btn-outline-primary w-100">Manage Posts</a></div>
+                </div>
             </div>
-            <div class="col-lg-6" id="journey-container">
+
+            <!-- Projects -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="subheader mb-2">Projects</div>
+                        <div class="h1 mb-3">{{stats.projectTotal}}</div>
+                        <div class="d-flex mb-2">
+                            <div>{{stats.projectPublished}} published</div>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-green" style="width: {{#if stats.projectTotal}}{{percentage stats.projectPublished stats.projectTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><a href="/projects" class="btn btn-sm btn-outline-primary w-100">Manage Projects</a></div>
+                </div>
             </div>
+
+            <!-- Subscribers -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="subheader mb-2">Subscribers</div>
+                        <div class="h1 mb-3">{{stats.subscriberTotal}}</div>
+                        <div class="d-flex mb-2">
+                            <div>{{stats.subscriberActive}} active</div>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-cyan" style="width: {{#if stats.subscriberTotal}}{{percentage stats.subscriberActive stats.subscriberTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><a href="/subscribers" class="btn btn-sm btn-outline-primary w-100">Manage Subscribers</a></div>
+                </div>
+            </div>
+
+            <!-- Newsletters -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="subheader mb-2">Newsletters</div>
+                        <div class="h1 mb-3">{{stats.newsletterTotal}}</div>
+                        <div class="d-flex mb-2">
+                            <div>{{stats.newsletterSent}} sent</div>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-orange" style="width: {{#if stats.newsletterTotal}}{{percentage stats.newsletterSent stats.newsletterTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><a href="/newsletters" class="btn btn-sm btn-outline-primary w-100">Manage Newsletters</a></div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Secondary Stats -->
+        <div class="row row-deck row-cards">
+
+            <div class="col-sm-4">
+                <div class="card card-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="bg-azure text-white avatar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="font-weight-medium">{{stats.workExpTotal}} Work Experience</div>
+                                <div class="text-secondary">Roles on your portfolio</div>
+                            </div>
+                            <div class="col-auto"><a href="/work-experience" class="btn btn-sm btn-outline-secondary">Manage</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="card card-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="bg-green text-white avatar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></svg>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="font-weight-medium">{{stats.skillTotal}} Skills</div>
+                                <div class="text-secondary">Listed on your portfolio</div>
+                            </div>
+                            <div class="col-auto"><a href="/skills" class="btn btn-sm btn-outline-secondary">Manage</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="card card-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="bg-yellow text-white avatar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/></svg>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="font-weight-medium">{{stats.testimonialTotal}} Testimonials</div>
+                                <div class="text-secondary">From colleagues &amp; clients</div>
+                            </div>
+                            <div class="col-auto"><a href="/testimonials" class="btn btn-sm btn-outline-secondary">Manage</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </div>

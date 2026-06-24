@@ -1,0 +1,300 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Projects</h2>
+                <div class="text-secondary mt-1">{{items.length}} project{{#if (neq items.length 1)}}s{{/if}}</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <button class="btn btn-primary" onclick="openNew()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" /><path d="M5 12l14 0" />
+                    </svg>
+                    New Project
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            {{#if items.length}}
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Tech Stack</th>
+                            <th>Status</th>
+                            <th>Featured</th>
+                            <th>Links</th>
+                            <th>Order</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td>
+                                <div class="fw-medium">{{this.title}}</div>
+                                {{#if this.slug}}<div class="text-secondary small"><code>/{{this.slug}}</code></div>{{/if}}
+                            </td>
+                            <td>
+                                {{#if this.techStack}}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {{#each this.techStack}}
+                                    <span class="badge bg-azure-lt">{{this}}</span>
+                                    {{/each}}
+                                </div>
+                                {{else}}
+                                <span class="text-secondary">—</span>
+                                {{/if}}
+                            </td>
+                            <td>
+                                {{#if (eq this.status 'published')}}
+                                <span class="badge bg-success-lt">Published</span>
+                                {{else}}
+                                <span class="badge bg-secondary-lt">Draft</span>
+                                {{/if}}
+                            </td>
+                            <td>{{#if this.featured}}<span class="badge bg-yellow-lt">Featured</span>{{else}}<span class="text-secondary">—</span>{{/if}}</td>
+                            <td>
+                                {{#if this.githubUrl}}<a href="{{this.githubUrl}}" target="_blank" rel="noopener noreferrer" class="me-2" title="GitHub">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"/></svg>
+                                </a>{{/if}}
+                                {{#if this.liveUrl}}<a href="{{this.liveUrl}}" target="_blank" rel="noopener noreferrer" title="Live">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M11 13l9 -9"/><path d="M15 4h5v5"/></svg>
+                                </a>{{/if}}
+                                {{#if (and (not this.githubUrl) (not this.liveUrl))}}<span class="text-secondary">—</span>{{/if}}
+                            </td>
+                            <td class="text-secondary">{{this.order}}</td>
+                            <td>
+                                <div class="btn-list flex-nowrap">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="editItem('{{this._id}}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        onclick="deleteItem('{{this._id}}', '{{this.title}}')">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <div class="card-body">
+                <div class="empty">
+                    <p class="empty-title">No projects yet</p>
+                    <p class="empty-subtitle text-secondary">Add your projects to showcase them on your portfolio.</p>
+                    <div class="empty-action">
+                        <button class="btn btn-primary" onclick="openNew()">Add first project</button>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">New Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="item-form" onsubmit="submitForm(event)">
+                <input type="hidden" id="item-id">
+                <div class="modal-body">
+                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label required">Title</label>
+                            <input type="text" id="field-title" class="form-control" placeholder="Project title" required>
+                        </div>
+                        <div class="col-9">
+                            <label class="form-label">Slug <span class="text-secondary">(auto-generated)</span></label>
+                            <input type="text" id="field-slug" class="form-control" placeholder="project-slug">
+                        </div>
+                        <div class="col-3">
+                            <label class="form-label">Order</label>
+                            <input type="number" id="field-order" class="form-control" value="0" min="0">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Short Description</label>
+                            <textarea id="field-description" class="form-control" rows="2"
+                                placeholder="Brief description for cards…"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Full Content</label>
+                            <textarea id="field-content" class="form-control" rows="6"
+                                placeholder="Detailed project description…"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Tech Stack <span class="text-secondary">(comma-separated)</span></label>
+                            <input type="text" id="field-tech-stack" class="form-control"
+                                placeholder="React, Node.js, PostgreSQL">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Cover Image URL</label>
+                            <input type="url" id="field-cover-image" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">GitHub URL</label>
+                            <input type="url" id="field-github-url" class="form-control" placeholder="https://github.com/...">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Live URL</label>
+                            <input type="url" id="field-live-url" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Status</label>
+                            <select id="field-status" class="form-select">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                            </select>
+                        </div>
+                        <div class="col-4 d-flex align-items-end pb-1">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="field-featured">
+                                <span class="form-check-label">Featured project</span>
+                            </label>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">SEO Title</label>
+                            <input type="text" id="field-seo-title" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">SEO Description</label>
+                            <input type="text" id="field-seo-description" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = '/projects';
+
+    function slugify(str) {
+        return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    document.getElementById('field-title').addEventListener('input', function () {
+        const slugField = document.getElementById('field-slug');
+        if (!slugField.dataset.manual) slugField.value = slugify(this.value);
+    });
+    document.getElementById('field-slug').addEventListener('input', function () {
+        this.dataset.manual = this.value ? 'true' : '';
+    });
+
+    function openNew() {
+        document.getElementById('modal-title').textContent = 'New Project';
+        document.getElementById('item-id').value = '';
+        document.getElementById('item-form').reset();
+        document.getElementById('field-slug').dataset.manual = '';
+        document.getElementById('field-order').value = '0';
+        document.getElementById('form-error').classList.add('d-none');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    }
+
+    async function editItem(id) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`);
+            const data = await res.json();
+            document.getElementById('modal-title').textContent = 'Edit Project';
+            document.getElementById('item-id').value = data._id;
+            document.getElementById('field-title').value = data.title || '';
+            document.getElementById('field-slug').value = data.slug || '';
+            document.getElementById('field-slug').dataset.manual = 'true';
+            document.getElementById('field-description').value = data.description || '';
+            document.getElementById('field-content').value = data.content || '';
+            document.getElementById('field-tech-stack').value = (data.techStack || []).join(', ');
+            document.getElementById('field-cover-image').value = data.coverImage || '';
+            document.getElementById('field-github-url').value = data.githubUrl || '';
+            document.getElementById('field-live-url').value = data.liveUrl || '';
+            document.getElementById('field-status').value = data.status || 'draft';
+            document.getElementById('field-featured').checked = !!data.featured;
+            document.getElementById('field-order').value = data.order ?? 0;
+            document.getElementById('field-seo-title').value = data.seoTitle || '';
+            document.getElementById('field-seo-description').value = data.seoDescription || '';
+            document.getElementById('form-error').classList.add('d-none');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+        } catch (err) {
+            alert('Failed to load project data.');
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('item-id').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${BASE_URL}/${id}` : BASE_URL;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+        try {
+            const payload = {
+                title: document.getElementById('field-title').value.trim(),
+                slug: document.getElementById('field-slug').value.trim(),
+                description: document.getElementById('field-description').value.trim(),
+                content: document.getElementById('field-content').value.trim(),
+                techStack: document.getElementById('field-tech-stack').value.trim(),
+                coverImage: document.getElementById('field-cover-image').value.trim(),
+                githubUrl: document.getElementById('field-github-url').value.trim(),
+                liveUrl: document.getElementById('field-live-url').value.trim(),
+                status: document.getElementById('field-status').value,
+                featured: document.getElementById('field-featured').checked,
+                order: parseInt(document.getElementById('field-order').value) || 0,
+                seoTitle: document.getElementById('field-seo-title').value.trim(),
+                seoDescription: document.getElementById('field-seo-description').value.trim(),
+            };
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'An error occurred');
+            }
+        } catch (err) {
+            showError('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save';
+        }
+    }
+
+    async function deleteItem(id, title) {
+        if (!confirm(`Delete project "${title}"? This cannot be undone.`)) return;
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Delete failed');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+    }
+</script>

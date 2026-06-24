@@ -1,0 +1,234 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Newsletters</h2>
+                <div class="text-secondary mt-1">{{items.length}} campaign{{#if (neq items.length 1)}}s{{/if}}</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <button class="btn btn-primary" onclick="openNew()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" /><path d="M5 12l14 0" />
+                    </svg>
+                    New Campaign
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            {{#if items.length}}
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Sent At</th>
+                            <th>Recipients</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td class="fw-medium">{{this.title}}</td>
+                            <td class="text-secondary">{{this.subject}}</td>
+                            <td>
+                                {{#if (eq this.status 'sent')}}
+                                <span class="badge bg-success-lt">Sent</span>
+                                {{else}}
+                                <span class="badge bg-secondary-lt">Draft</span>
+                                {{/if}}
+                            </td>
+                            <td class="text-secondary">{{formatDate this.sentAt}}</td>
+                            <td class="text-secondary">{{this.recipientCount}}</td>
+                            <td>
+                                <div class="btn-list flex-nowrap">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="editItem('{{this._id}}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        onclick="deleteItem('{{this._id}}', '{{this.title}}')">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <div class="card-body">
+                <div class="empty">
+                    <p class="empty-title">No campaigns yet</p>
+                    <p class="empty-subtitle text-secondary">Create your first newsletter campaign to send to subscribers.</p>
+                    <div class="empty-action">
+                        <button class="btn btn-primary" onclick="openNew()">Create campaign</button>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">New Campaign</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="item-form" onsubmit="submitForm(event)">
+                <input type="hidden" id="item-id">
+                <div class="modal-body">
+                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                    <div id="send-warning" class="alert alert-warning d-none mb-3">
+                        <strong>Warning:</strong> Setting status to <strong>Sent</strong> will immediately email all active subscribers. This cannot be undone.
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-8">
+                            <label class="form-label required">Title <span class="text-secondary">(internal)</span></label>
+                            <input type="text" id="field-title" class="form-control" placeholder="e.g. March 2024 Update"
+                                required>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Status</label>
+                            <select id="field-status" class="form-select">
+                                <option value="draft">Draft</option>
+                                <option value="sent">Sent</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label required">Subject Line</label>
+                            <input type="text" id="field-subject" class="form-control"
+                                placeholder="What subscribers see in their inbox" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Preview Text</label>
+                            <input type="text" id="field-preview-text" class="form-control"
+                                placeholder="Short preview shown in email clients">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Email Body (HTML)</label>
+                            <textarea id="field-body-html" class="form-control font-monospace" rows="10"
+                                placeholder="<h1>Hello!</h1><p>Your content here…</p>"></textarea>
+                            <small class="form-hint">Full HTML is supported. Leave blank to send the subject as a simple heading.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = '/newsletters';
+
+    document.getElementById('field-status').addEventListener('change', function () {
+        const warning = document.getElementById('send-warning');
+        if (this.value === 'sent') {
+            warning.classList.remove('d-none');
+        } else {
+            warning.classList.add('d-none');
+        }
+    });
+
+    function openNew() {
+        document.getElementById('modal-title').textContent = 'New Campaign';
+        document.getElementById('item-id').value = '';
+        document.getElementById('item-form').reset();
+        document.getElementById('form-error').classList.add('d-none');
+        document.getElementById('send-warning').classList.add('d-none');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    }
+
+    async function editItem(id) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`);
+            const data = await res.json();
+            document.getElementById('modal-title').textContent = 'Edit Campaign';
+            document.getElementById('item-id').value = data._id;
+            document.getElementById('field-title').value = data.title || '';
+            document.getElementById('field-subject').value = data.subject || '';
+            document.getElementById('field-preview-text').value = data.previewText || '';
+            document.getElementById('field-body-html').value = data.bodyHtml || '';
+            document.getElementById('field-status').value = data.status || 'draft';
+            document.getElementById('form-error').classList.add('d-none');
+            document.getElementById('send-warning').classList.add('d-none');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+        } catch (err) {
+            alert('Failed to load campaign data.');
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('item-id').value;
+        const newStatus = document.getElementById('field-status').value;
+
+        if (newStatus === 'sent' && !confirm('Send this campaign to all active subscribers now?')) return;
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${BASE_URL}/${id}` : BASE_URL;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = newStatus === 'sent'
+            ? '<span class="spinner-border spinner-border-sm me-1"></span>Sending…'
+            : '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+        try {
+            const payload = {
+                title: document.getElementById('field-title').value.trim(),
+                subject: document.getElementById('field-subject').value.trim(),
+                previewText: document.getElementById('field-preview-text').value.trim(),
+                bodyHtml: document.getElementById('field-body-html').value.trim(),
+                status: newStatus,
+            };
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'An error occurred');
+            }
+        } catch (err) {
+            showError('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save';
+        }
+    }
+
+    async function deleteItem(id, title) {
+        if (!confirm(`Delete campaign "${title}"? This cannot be undone.`)) return;
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Delete failed');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+    }
+</script>

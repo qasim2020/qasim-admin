@@ -166,7 +166,7 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
           aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon">
-            <img src="/static/logo.png" alt="ILH">
+            <img src="/static/logo.png" alt="QA">
           </span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
@@ -222,7 +222,7 @@
         <h1 class="navbar-brand navbar-brand-autodark me-auto ms-3 ms-md-auto">
           <a class="d-flex align-items-center" href="/dashboard">
             <img src="/static/logo.png" alt="Tabler" class="navbar-brand-image">
-            <span class="ms-2">ILH</span>
+            <span class="ms-2">QA</span>
           </a>
         </h1>
 
@@ -271,147 +271,75 @@
             <li class="nav-item">
               <a class="nav-link" href="/dashboard">
                 <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></svg>
                 </span>
-                <span class="nav-link-title">
-                  Dashboard
-                </span>
+                <span class="nav-link-title">Dashboard</span>
               </a>
             </li>
 
+            {{!-- Content --}}
             <li class="nav-item">
-              <a class="nav-link" href="/beneficiaries" data-bs-toggle="tooltip" data-bs-title="Beneficiaries">
-                <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-users">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                  </svg>
-                </span>
-                <span class="nav-link-title">
-                  Beneficiaries
-                </span>
+              <a class="nav-link" href="/blog">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M13 8l2 0"/><path d="M13 12l2 0"/></svg></span>
+                <span class="nav-link-title">Blog</span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/customers">
-                <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-building">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 21l18 0" />
-                    <path d="M9 8l1 0" />
-                    <path d="M9 12l1 0" />
-                    <path d="M9 16l1 0" />
-                    <path d="M14 8l1 0" />
-                    <path d="M14 12l1 0" />
-                    <path d="M14 16l1 0" />
-                    <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
-                  </svg>
-                </span>
-                <span class="nav-link-title">
-                  Customers
-                </span>
+              <a class="nav-link" href="/projects">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg></span>
+                <span class="nav-link-title">Projects</span>
               </a>
             </li>
-
-            <li class="nav-item dropdown show">
-              <a class="nav-link dropdown-toggle" href="/projects" data-bs-toggle="dropdown" data-bs-auto-close="false"
-                role="button" aria-expanded="false">
-                <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-analytics">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                    <path d="M9 17l0 -5" />
-                    <path d="M12 17l0 -1" />
-                    <path d="M15 17l0 -3" />
-                  </svg>
-                </span>
-                <span class="nav-link-title">
-                  Projects
-                </span>
-              </a>
-
-              <div class="dropdown-menu show">
-                <a href="/projects" class="nav-link">
-                  <span class="nav-link-icon d-lg-inline-block">
-                  </span>
-                  <span class="nav-link-title">
-                    All Projects
-                  </span>
-                </a>
-              </div>
-            </li>
-
+            {{!-- Taxonomy --}}
             <li class="nav-item">
-              <a class="nav-link" href="/orders" rel="noopener">
-                <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-credit-card">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
-                    <path d="M3 10l18 0" />
-                    <path d="M7 15l.01 0" />
-                    <path d="M11 15l2 0" />
-                  </svg>
-                </span>
-                <span class="nav-link-title">
-                  Orders
-                </span>
+              <a class="nav-link" href="/tags">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/></svg></span>
+                <span class="nav-link-title">Tags</span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/users">
-                <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-device-imac">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 4a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-12z" />
-                    <path d="M3 13h18" />
-                    <path d="M8 21h8" />
-                    <path d="M10 17l-.5 4" />
-                    <path d="M14 17l.5 4" />
-                  </svg>
-                </span>
-                <span class="nav-link-title">
-                  Administrators
-                </span>
+              <a class="nav-link" href="/categories">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 4h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/><path d="M19 4h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/><path d="M9 14h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/><path d="M19 14h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/></svg></span>
+                <span class="nav-link-title">Categories</span>
               </a>
             </li>
-
+            {{!-- Newsletter --}}
             <li class="nav-item">
-              <a class="nav-link" href="/settings">
-                <span class="nav-link-icon d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-settings">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path
-                      d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
-                    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-                  </svg>
-                </span>
-                <span class="nav-link-title">
-                  Settings
-                </span>
+              <a class="nav-link" href="/subscribers">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/><path d="M3 7l9 6l9 -6"/></svg></span>
+                <span class="nav-link-title">Subscribers</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/newsletters">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 20h-7a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v5"/><path d="M16 19h6"/><path d="M19 16v6"/><path d="M3 8h18"/></svg></span>
+                <span class="nav-link-title">Newsletters</span>
+              </a>
+            </li>
+            {{!-- Portfolio --}}
+            <li class="nav-item">
+              <a class="nav-link" href="/work-experience">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v13a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-13z"/><path d="M8 5v-1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v1"/></svg></span>
+                <span class="nav-link-title">Work Experience</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/skills">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"/><path d="M9.7 17l4.6 0"/></svg></span>
+                <span class="nav-link-title">Skills</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/testimonials">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M10 8h4"/><path d="M10 12h4"/></svg></span>
+                <span class="nav-link-title">Testimonials</span>
+              </a>
+            </li>
+            {{!-- Config --}}
+            <li class="nav-item">
+              <a class="nav-link" href="/site-settings">
+                <span class="nav-link-icon d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></svg></span>
+                <span class="nav-link-title">Site Settings</span>
               </a>
             </li>
           </ul>
@@ -431,100 +359,57 @@
           <ul class="navbar-nav pt-lg-3">
             <li class="nav-item">
               <a class="nav-link" href="/dashboard" data-bs-toggle="tooltip" data-bs-title="Dashboard">
-                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-                  </svg>
-                </span>
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></svg></span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/beneficiaries" data-bs-toggle="tooltip" data-bs-title="Beneficiaries">
-                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-users">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                  </svg>
-                </span>
+              <a class="nav-link" href="/blog" data-bs-toggle="tooltip" data-bs-title="Blog">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M13 8l2 0"/><path d="M13 12l2 0"/></svg></span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/customers" data-bs-toggle="tooltip" data-bs-title="Customers">
-                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-building">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 21l18 0" />
-                    <path d="M9 8l1 0" />
-                    <path d="M9 12l1 0" />
-                    <path d="M9 16l1 0" />
-                    <path d="M14 8l1 0" />
-                    <path d="M14 12l1 0" />
-                    <path d="M14 16l1 0" />
-                    <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
-                  </svg>
-                </span>
+              <a class="nav-link" href="/projects" data-bs-toggle="tooltip" data-bs-title="Projects">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg></span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/projects" data-bs-toggle="tooltip" data-bs-title="All Projects">
-                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-analytics">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                    <path d="M9 17l0 -5" />
-                    <path d="M12 17l0 -1" />
-                    <path d="M15 17l0 -3" />
-                  </svg>
-                </span>
+              <a class="nav-link" href="/tags" data-bs-toggle="tooltip" data-bs-title="Tags">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/></svg></span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/users" data-bs-toggle="tooltip" data-bs-title="Administrators">
-                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-device-imac">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 4a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-12z" />
-                    <path d="M3 13h18" />
-                    <path d="M8 21h8" />
-                    <path d="M10 17l-.5 4" />
-                    <path d="M14 17l.5 4" />
-                  </svg>
-                </span>
+              <a class="nav-link" href="/categories" data-bs-toggle="tooltip" data-bs-title="Categories">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 4h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/><path d="M19 4h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/><path d="M9 14h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/><path d="M19 14h-4a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2z"/></svg></span>
               </a>
             </li>
-
             <li class="nav-item">
-              <a class="nav-link" href="/settings" data-bs-toggle="tooltip" data-bs-title="Settings">
-                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-settings">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path
-                      d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
-                    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-                  </svg>
-                </span>
+              <a class="nav-link" href="/subscribers" data-bs-toggle="tooltip" data-bs-title="Subscribers">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/><path d="M3 7l9 6l9 -6"/></svg></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/newsletters" data-bs-toggle="tooltip" data-bs-title="Newsletters">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 20h-7a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v5"/><path d="M16 19h6"/><path d="M19 16v6"/><path d="M3 8h18"/></svg></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/work-experience" data-bs-toggle="tooltip" data-bs-title="Work Experience">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v13a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-13z"/><path d="M8 5v-1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v1"/></svg></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/skills" data-bs-toggle="tooltip" data-bs-title="Skills">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"/><path d="M9.7 17l4.6 0"/></svg></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/testimonials" data-bs-toggle="tooltip" data-bs-title="Testimonials">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M10 8h4"/><path d="M10 12h4"/></svg></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/site-settings" data-bs-toggle="tooltip" data-bs-title="Site Settings">
+                <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></svg></span>
               </a>
             </li>
           </ul>
@@ -541,7 +426,7 @@
               <ul class="list-inline list-inline-dots mb-0">
                 <li class="list-inline-item">
                   Copyright &copy; 2025
-                  <a href="https://ilearninghubb.com" class="link-secondary">Islamic Learning Hubb</a>.
+                  <a href="https://qasim.no" class="link-secondary">Qasim Ali</a>.
                   All rights reserved.
                 </li>
                 <li class="list-inline-item">

@@ -1,0 +1,228 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Skills</h2>
+                <div class="text-secondary mt-1">{{items.length}} skill{{#if (neq items.length 1)}}s{{/if}}</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <button class="btn btn-primary" onclick="openNew()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" />
+                        <path d="M5 12l14 0" />
+                    </svg>
+                    New Skill
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            {{#if items.length}}
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Proficiency</th>
+                            <th>Icon</th>
+                            <th>Order</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td class="fw-medium">{{this.name}}</td>
+                            <td>
+                                {{#if (eq this.category 'frontend')}}<span class="badge bg-blue-lt">Frontend</span>
+                                {{else if (eq this.category 'backend')}}<span class="badge bg-green-lt">Backend</span>
+                                {{else if (eq this.category 'devops')}}<span class="badge bg-orange-lt">DevOps</span>
+                                {{else if (eq this.category 'database')}}<span class="badge bg-red-lt">Database</span>
+                                {{else if (eq this.category 'design')}}<span class="badge bg-purple-lt">Design</span>
+                                {{else}}<span class="badge bg-secondary-lt">Other</span>
+                                {{/if}}
+                            </td>
+                            <td>
+                                {{#if (eq this.proficiency 'expert')}}<span class="badge bg-green">Expert</span>
+                                {{else if (eq this.proficiency 'advanced')}}<span class="badge bg-blue">Advanced</span>
+                                {{else if (eq this.proficiency 'intermediate')}}<span class="badge bg-azure-lt">Intermediate</span>
+                                {{else}}<span class="badge bg-secondary-lt">Beginner</span>
+                                {{/if}}
+                            </td>
+                            <td class="text-secondary">{{this.icon}}</td>
+                            <td class="text-secondary">{{this.order}}</td>
+                            <td>
+                                <div class="btn-list flex-nowrap">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="editItem('{{this._id}}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        onclick="deleteItem('{{this._id}}', '{{this.name}}')">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <div class="card-body">
+                <div class="empty">
+                    <p class="empty-title">No skills yet</p>
+                    <p class="empty-subtitle text-secondary">Add your technical skills to display on your portfolio.</p>
+                    <div class="empty-action">
+                        <button class="btn btn-primary" onclick="openNew()">Add first skill</button>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">New Skill</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="item-form" onsubmit="submitForm(event)">
+                <input type="hidden" id="item-id">
+                <div class="modal-body">
+                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label required">Name</label>
+                            <input type="text" id="field-name" class="form-control" placeholder="e.g. React" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Category</label>
+                            <select id="field-category" class="form-select">
+                                <option value="frontend">Frontend</option>
+                                <option value="backend">Backend</option>
+                                <option value="devops">DevOps</option>
+                                <option value="database">Database</option>
+                                <option value="design">Design</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Proficiency</label>
+                            <select id="field-proficiency" class="form-select">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate" selected>Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                        <div class="col-8">
+                            <label class="form-label">Icon <span class="text-secondary">(URL or icon name)</span></label>
+                            <input type="text" id="field-icon" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Order</label>
+                            <input type="number" id="field-order" class="form-control" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = '/skills';
+
+    function openNew() {
+        document.getElementById('modal-title').textContent = 'New Skill';
+        document.getElementById('item-id').value = '';
+        document.getElementById('item-form').reset();
+        document.getElementById('field-order').value = '0';
+        document.getElementById('form-error').classList.add('d-none');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    }
+
+    async function editItem(id) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`);
+            const data = await res.json();
+            document.getElementById('modal-title').textContent = 'Edit Skill';
+            document.getElementById('item-id').value = data._id;
+            document.getElementById('field-name').value = data.name || '';
+            document.getElementById('field-category').value = data.category || 'other';
+            document.getElementById('field-proficiency').value = data.proficiency || 'intermediate';
+            document.getElementById('field-icon').value = data.icon || '';
+            document.getElementById('field-order').value = data.order ?? 0;
+            document.getElementById('form-error').classList.add('d-none');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+        } catch (err) {
+            alert('Failed to load skill data.');
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('item-id').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${BASE_URL}/${id}` : BASE_URL;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+        try {
+            const payload = {
+                name: document.getElementById('field-name').value.trim(),
+                category: document.getElementById('field-category').value,
+                proficiency: document.getElementById('field-proficiency').value,
+                icon: document.getElementById('field-icon').value.trim(),
+                order: parseInt(document.getElementById('field-order').value) || 0,
+            };
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'An error occurred');
+            }
+        } catch (err) {
+            showError('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save';
+        }
+    }
+
+    async function deleteItem(id, name) {
+        if (!confirm(`Delete skill "${name}"? This cannot be undone.`)) return;
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Delete failed');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+    }
+</script>

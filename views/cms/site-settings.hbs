@@ -1,0 +1,191 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Site Settings</h2>
+                <div class="text-secondary mt-1">Global portfolio configuration</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div id="save-success" class="alert alert-success d-none mb-3">Settings saved successfully.</div>
+        <div id="save-error" class="alert alert-danger d-none mb-3"></div>
+
+        <form id="settings-form" onsubmit="saveSettings(event)">
+
+            <!-- Identity -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Identity</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="field-full-name" class="form-control"
+                                value="{{settings.fullName}}" placeholder="e.g. Qasim Ali">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tagline</label>
+                            <input type="text" id="field-tagline" class="form-control"
+                                value="{{settings.tagline}}" placeholder="e.g. Full-Stack Developer">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Bio</label>
+                            <textarea id="field-bio" class="form-control" rows="4"
+                                placeholder="A short bio for your portfolio…">{{settings.bio}}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Profile Photo URL</label>
+                            <input type="url" id="field-profile-photo" class="form-control"
+                                value="{{settings.profilePhoto}}" placeholder="https://...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Resume URL</label>
+                            <input type="url" id="field-resume-url" class="form-control"
+                                value="{{settings.resumeUrl}}" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Contact</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Email</label>
+                            <input type="email" id="field-contact-email" class="form-control"
+                                value="{{settings.contactEmail}}" placeholder="hello@example.com">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Social Links</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">GitHub</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"/></svg>
+                                </span>
+                                <input type="url" id="field-github-url" class="form-control"
+                                    value="{{settings.githubUrl}}" placeholder="https://github.com/username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">LinkedIn</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="11" x2="8" y2="16"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="16" x2="12" y2="11"/><path d="M16 16v-3a2 2 0 0 0 -4 0"/></svg>
+                                </span>
+                                <input type="url" id="field-linkedin-url" class="form-control"
+                                    value="{{settings.linkedinUrl}}" placeholder="https://linkedin.com/in/username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Twitter / X</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+                                </span>
+                                <input type="url" id="field-twitter-url" class="form-control"
+                                    value="{{settings.twitterUrl}}" placeholder="https://x.com/username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">YouTube</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="3" y="5" width="18" height="14" rx="4"/><path d="M10 9l5 3l-5 3z"/></svg>
+                                </span>
+                                <input type="url" id="field-youtube-url" class="form-control"
+                                    value="{{settings.youtubeUrl}}" placeholder="https://youtube.com/@username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Instagram</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3"/><line x1="16.5" y1="7.5" x2="16.5" y2="7.501"/></svg>
+                                </span>
+                                <input type="url" id="field-instagram-url" class="form-control"
+                                    value="{{settings.instagramUrl}}" placeholder="https://instagram.com/username">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" id="save-btn" class="btn btn-primary btn-lg">
+                    Save Settings
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    async function saveSettings(e) {
+        e.preventDefault();
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+        document.getElementById('save-success').classList.add('d-none');
+        document.getElementById('save-error').classList.add('d-none');
+
+        try {
+            const payload = {
+                fullName: document.getElementById('field-full-name').value.trim(),
+                tagline: document.getElementById('field-tagline').value.trim(),
+                bio: document.getElementById('field-bio').value.trim(),
+                profilePhoto: document.getElementById('field-profile-photo').value.trim(),
+                resumeUrl: document.getElementById('field-resume-url').value.trim(),
+                contactEmail: document.getElementById('field-contact-email').value.trim(),
+                githubUrl: document.getElementById('field-github-url').value.trim(),
+                linkedinUrl: document.getElementById('field-linkedin-url').value.trim(),
+                twitterUrl: document.getElementById('field-twitter-url').value.trim(),
+                youtubeUrl: document.getElementById('field-youtube-url').value.trim(),
+                instagramUrl: document.getElementById('field-instagram-url').value.trim(),
+            };
+
+            const res = await fetch('/site-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                const el = document.getElementById('save-success');
+                el.classList.remove('d-none');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                const el = document.getElementById('save-error');
+                el.textContent = data.error || 'An error occurred';
+                el.classList.remove('d-none');
+            }
+        } catch (err) {
+            const el = document.getElementById('save-error');
+            el.textContent = 'Network error. Please try again.';
+            el.classList.remove('d-none');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save Settings';
+        }
+    }
+</script>

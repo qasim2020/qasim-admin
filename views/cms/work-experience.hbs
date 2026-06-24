@@ -1,0 +1,248 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Work Experience</h2>
+                <div class="text-secondary mt-1">{{items.length}} position{{#if (neq items.length 1)}}s{{/if}}</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <button class="btn btn-primary" onclick="openNew()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" /><path d="M5 12l14 0" />
+                    </svg>
+                    Add Position
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            {{#if items.length}}
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Role</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Status</th>
+                            <th>Order</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td>
+                                <div class="fw-medium">{{this.company}}</div>
+                                {{#if this.companyUrl}}
+                                <div class="text-secondary small">
+                                    <a href="{{this.companyUrl}}" target="_blank" rel="noopener noreferrer">{{this.companyUrl}}</a>
+                                </div>
+                                {{/if}}
+                            </td>
+                            <td class="fw-medium">{{this.role}}</td>
+                            <td class="text-secondary">{{formatDate this.startDate}}</td>
+                            <td class="text-secondary">{{#if this.current}}—{{else}}{{formatDate this.endDate}}{{/if}}</td>
+                            <td>
+                                {{#if this.current}}
+                                <span class="badge bg-green-lt">Current</span>
+                                {{else}}
+                                <span class="badge bg-secondary-lt">Past</span>
+                                {{/if}}
+                            </td>
+                            <td class="text-secondary">{{this.order}}</td>
+                            <td>
+                                <div class="btn-list flex-nowrap">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        onclick="editItem('{{this._id}}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        onclick="deleteItem('{{this._id}}', '{{this.company}}')">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <div class="card-body">
+                <div class="empty">
+                    <p class="empty-title">No work experience yet</p>
+                    <p class="empty-subtitle text-secondary">Add your work history to display on your portfolio.</p>
+                    <div class="empty-action">
+                        <button class="btn btn-primary" onclick="openNew()">Add first position</button>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Add Position</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="item-form" onsubmit="submitForm(event)">
+                <input type="hidden" id="item-id">
+                <div class="modal-body">
+                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label required">Company</label>
+                            <input type="text" id="field-company" class="form-control" placeholder="e.g. Acme Corp"
+                                required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label required">Role / Title</label>
+                            <input type="text" id="field-role" class="form-control" placeholder="e.g. Senior Developer"
+                                required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label required">Start Date</label>
+                            <input type="date" id="field-start-date" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">End Date</label>
+                            <input type="date" id="field-end-date" class="form-control" id="field-end-date">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="field-current">
+                                <span class="form-check-label">Currently working here</span>
+                            </label>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea id="field-description" class="form-control" rows="4"
+                                placeholder="Describe your responsibilities and achievements…"></textarea>
+                        </div>
+                        <div class="col-8">
+                            <label class="form-label">Company URL</label>
+                            <input type="url" id="field-company-url" class="form-control"
+                                placeholder="https://company.com">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Order</label>
+                            <input type="number" id="field-order" class="form-control" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = '/work-experience';
+
+    document.getElementById('field-current').addEventListener('change', function () {
+        document.getElementById('field-end-date').disabled = this.checked;
+        if (this.checked) document.getElementById('field-end-date').value = '';
+    });
+
+    function openNew() {
+        document.getElementById('modal-title').textContent = 'Add Position';
+        document.getElementById('item-id').value = '';
+        document.getElementById('item-form').reset();
+        document.getElementById('field-end-date').disabled = false;
+        document.getElementById('field-order').value = '0';
+        document.getElementById('form-error').classList.add('d-none');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    }
+
+    async function editItem(id) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`);
+            const data = await res.json();
+            document.getElementById('modal-title').textContent = 'Edit Position';
+            document.getElementById('item-id').value = data._id;
+            document.getElementById('field-company').value = data.company || '';
+            document.getElementById('field-role').value = data.role || '';
+            document.getElementById('field-start-date').value = data.startDate ? data.startDate.substring(0, 10) : '';
+            document.getElementById('field-end-date').value = data.endDate ? data.endDate.substring(0, 10) : '';
+            document.getElementById('field-current').checked = !!data.current;
+            document.getElementById('field-end-date').disabled = !!data.current;
+            document.getElementById('field-description').value = data.description || '';
+            document.getElementById('field-company-url').value = data.companyUrl || '';
+            document.getElementById('field-order').value = data.order ?? 0;
+            document.getElementById('form-error').classList.add('d-none');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+        } catch (err) {
+            alert('Failed to load position data.');
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('item-id').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${BASE_URL}/${id}` : BASE_URL;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+        try {
+            const isCurrent = document.getElementById('field-current').checked;
+            const payload = {
+                company: document.getElementById('field-company').value.trim(),
+                role: document.getElementById('field-role').value.trim(),
+                startDate: document.getElementById('field-start-date').value,
+                endDate: isCurrent ? null : document.getElementById('field-end-date').value || null,
+                current: isCurrent,
+                description: document.getElementById('field-description').value.trim(),
+                companyUrl: document.getElementById('field-company-url').value.trim(),
+                order: parseInt(document.getElementById('field-order').value) || 0,
+            };
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'An error occurred');
+            }
+        } catch (err) {
+            showError('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save';
+        }
+    }
+
+    async function deleteItem(id, company) {
+        if (!confirm(`Delete position at "${company}"? This cannot be undone.`)) return;
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Delete failed');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+    }
+</script>

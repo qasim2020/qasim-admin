@@ -1,0 +1,463 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">Blog Posts</h2>
+                <div class="text-secondary mt-1">
+                    {{#if pagination.q}}
+                        {{pagination.total}} result{{#if (neq pagination.total 1)}}s{{/if}} for &ldquo;{{pagination.q}}&rdquo;
+                        &nbsp;&mdash;&nbsp;
+                    {{/if}}
+                    Showing {{pagination.from}}–{{pagination.to}} of {{pagination.total}}
+                </div>
+            </div>
+            <!-- Search bar -->
+            <div class="col-auto">
+                <form method="GET" action="/blog">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control"
+                            placeholder="Search by title…"
+                            value="{{pagination.q}}"
+                            style="min-width:220px;">
+                        {{#if pagination.q}}
+                        <a href="/blog" class="btn btn-outline-secondary" title="Clear search">×</a>
+                        {{/if}}
+                    </div>
+                </form>
+            </div>
+            <!-- New Post button -->
+            <div class="col-auto d-print-none">
+                <button class="btn btn-primary" onclick="openNew()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5l0 14" /><path d="M5 12l14 0" />
+                    </svg>
+                    New Post
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+
+        {{#if items.length}}
+        <!-- Card grid -->
+        <div class="row row-cards">
+            {{#each items}}
+            <div class="col-12 col-sm-6 col-lg-4 d-flex">
+                <div class="card w-100">
+                    {{#if this.coverImage}}
+                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                        style="background-image: url('{{this.coverImage}}')"></div>
+                    {{/if}}
+                    <div class="card-body d-flex flex-column">
+                        <!-- Badges -->
+                        <div class="mb-2 d-flex flex-wrap gap-1">
+                            {{#if (eq this.status 'published')}}
+                            <span class="badge bg-success-lt">Published</span>
+                            {{else}}
+                            <span class="badge bg-secondary-lt">Draft</span>
+                            {{/if}}
+                            {{#each this.categories}}
+                            <span class="badge bg-blue-lt">{{this.name}}</span>
+                            {{/each}}
+                        </div>
+
+                        <!-- Title (extracted from h1: if title field is empty) -->
+                        <h3 class="card-title mb-1">
+                            {{#if this.title}}{{this.title}}{{else}}{{extractH1 this.content}}{{/if}}
+                        </h3>
+
+                        <!-- Content preview -->
+                        <p class="text-secondary small flex-grow-1 mt-1 mb-0">
+                            {{blogPreview this.content 160}}
+                        </p>
+
+                        <!-- Card footer row -->
+                        <div class="d-flex align-items-center justify-content-between mt-3 pt-2 border-top">
+                            <div class="text-secondary small">
+                                {{#if this.publishedAt}}
+                                    {{formatDate this.publishedAt}}
+                                {{else}}
+                                    {{formatDate this.createdAt}}
+                                {{/if}}
+                                {{#if this.readTimeMinutes}}
+                                <span class="ms-1">· {{this.readTimeMinutes}} min</span>
+                                {{/if}}
+                            </div>
+                            <div class="btn-list flex-nowrap">
+                                <button class="btn btn-sm {{#if this.featured}}btn-warning{{else}}btn-outline-secondary{{/if}}"
+                                    data-id="{{this._id}}"
+                                    data-featured="{{this.featured}}"
+                                    onclick="toggleFeatured(this.dataset.id, this.dataset.featured === 'true')"
+                                    title="{{#if this.featured}}Remove from featured{{else}}Mark as featured{{/if}}">★</button>
+                                <a href="/blog/{{this._id}}/view" class="btn btn-sm btn-outline-secondary">View</a>
+                                <button class="btn btn-sm btn-outline-primary"
+                                    data-id="{{this._id}}"
+                                    onclick="editItem(this.dataset.id)">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                    data-id="{{this._id}}"
+                                    data-name="{{this.title}}"
+                                    onclick="deleteItem(this.dataset.id, this.dataset.name)">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+        <!-- Pagination -->
+        {{#if (gt pagination.totalPages 1)}}
+        <div class="d-flex align-items-center justify-content-between mt-4">
+            <div class="text-secondary small">
+                Page {{pagination.page}} of {{pagination.totalPages}}
+            </div>
+            <ul class="pagination mb-0">
+                <li class="page-item {{#unless pagination.hasPrev}}disabled{{/unless}}">
+                    <a class="page-link" href="/blog?page={{pagination.prevPage}}&q={{pagination.q}}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="15 6 9 12 15 18" />
+                        </svg>
+                        prev
+                    </a>
+                </li>
+                {{#each pagination.pages}}
+                {{#if this.ellipsis}}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                {{else}}
+                <li class="page-item {{#if this.active}}active{{/if}}">
+                    <a class="page-link" href="/blog?page={{this.num}}&q={{../pagination.q}}">{{this.num}}</a>
+                </li>
+                {{/if}}
+                {{/each}}
+                <li class="page-item {{#unless pagination.hasNext}}disabled{{/unless}}">
+                    <a class="page-link" href="/blog?page={{pagination.nextPage}}&q={{pagination.q}}">
+                        next
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="9 6 15 12 9 18" />
+                        </svg>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {{/if}}
+
+        {{else}}
+        <!-- Empty state -->
+        <div class="card">
+            <div class="card-body">
+                <div class="empty">
+                    {{#if pagination.q}}
+                    <p class="empty-title">No posts match &ldquo;{{pagination.q}}&rdquo;</p>
+                    <p class="empty-subtitle text-secondary">Try a different search term.</p>
+                    <div class="empty-action">
+                        <a href="/blog" class="btn btn-secondary">Clear search</a>
+                    </div>
+                    {{else}}
+                    <p class="empty-title">No blog posts yet</p>
+                    <p class="empty-subtitle text-secondary">Write your first post to share your knowledge.</p>
+                    <div class="empty-action">
+                        <button class="btn btn-primary" onclick="openNew()">Write first post</button>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+    </div>
+</div>
+
+<!-- Tags & Categories data for edit modal multi-select -->
+<script>
+    const AVAILABLE_TAGS = [{{#each tags}}{ id: '{{this._id}}', name: '{{this.name}}' }{{#unless @last}},{{/unless}}{{/each}}];
+    const AVAILABLE_CATS = [{{#each categories}}{ id: '{{this._id}}', name: '{{this.name}}' }{{#unless @last}},{{/unless}}{{/each}}];
+</script>
+
+<!-- Create / Edit Modal -->
+<div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">New Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="item-form" onsubmit="submitForm(event)">
+                <input type="hidden" id="item-id">
+                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label required">Title</label>
+                            <input type="text" id="field-title" class="form-control"
+                                placeholder="Post title — or leave blank and use h1: in the body" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Slug <span class="text-secondary">(auto-generated from title)</span></label>
+                            <input type="text" id="field-slug" class="form-control" placeholder="post-slug">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Excerpt</label>
+                            <textarea id="field-excerpt" class="form-control" rows="2"
+                                placeholder="Short summary shown in lists…"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Cover Image URL</label>
+                            <input type="url" id="field-cover-image" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Status</label>
+                            <select id="field-status" class="form-select">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">Read Time (min)</label>
+                            <input type="number" id="field-read-time" class="form-control" min="1" placeholder="5">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">SEO Title</label>
+                            <input type="text" id="field-seo-title" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">SEO Description</label>
+                            <textarea id="field-seo-description" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Tags</label>
+                            <!-- Badge tag picker -->
+                            <div id="tag-badges" class="d-flex flex-wrap gap-1 mb-2"></div>
+                            <div class="">
+                                <input type="text" id="tag-search" class="form-control"
+                                    placeholder="Search and add tags…" autocomplete="off">
+                            </div>
+                            <div id="tag-dropdown" class="border rounded bg-white shadow-sm mt-1 d-none"
+                                style="max-height:200px;overflow-y:auto;position:relative;z-index:10;">
+                            </div>
+                            <!-- Hidden backing store -->
+                            <select id="field-tags" class="d-none" multiple></select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="item-form" id="save-btn" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_URL = '/blog';
+
+    // ── Tag Badge Picker ──────────────────────────────────────────────────────
+    const tagSelect     = document.getElementById('field-tags');
+    const tagBadges     = document.getElementById('tag-badges');
+    const tagSearch     = document.getElementById('tag-search');
+    const tagDropdown   = document.getElementById('tag-dropdown');
+
+    // Build option elements once (hidden select used only as data store)
+    AVAILABLE_TAGS.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.dataset.name = t.name;
+        tagSelect.appendChild(opt);
+    });
+
+    function getSelectedTagIds() {
+        return Array.from(tagSelect.options).filter(o => o.selected).map(o => o.value);
+    }
+
+    function renderBadges() {
+        tagBadges.innerHTML = '';
+        Array.from(tagSelect.options).filter(o => o.selected).forEach(o => {
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-blue-lt d-inline-flex align-items-center gap-1 px-2 py-1';
+            badge.style.fontSize = '0.8rem';
+            badge.innerHTML = `${o.dataset.name} <button type="button" class="btn-close btn-close-sm" style="font-size:0.6rem" data-id="${o.value}" aria-label="Remove"></button>`;
+            badge.querySelector('button').addEventListener('click', () => {
+                const opt = Array.from(tagSelect.options).find(x => x.value === o.value);
+                if (opt) opt.selected = false;
+                renderBadges();
+            });
+            tagBadges.appendChild(badge);
+        });
+    }
+
+    function renderDropdown(filter) {
+        tagDropdown.innerHTML = '';
+        const q = (filter || '').toLowerCase();
+        const selectedIds = new Set(getSelectedTagIds());
+        const matches = AVAILABLE_TAGS.filter(t =>
+            t.name.toLowerCase().includes(q) && !selectedIds.has(t.id)
+        ).slice(0, 50);
+
+        if (!matches.length) {
+            tagDropdown.innerHTML = '<div class="px-3 py-2 text-muted small">No results</div>';
+        } else {
+            matches.forEach(t => {
+                const item = document.createElement('div');
+                item.className = 'px-3 py-1 cursor-pointer tag-dropdown-item';
+                item.style.cssText = 'cursor:pointer;user-select:none';
+                item.textContent = t.name;
+                item.addEventListener('mousedown', e => {
+                    e.preventDefault();
+                    const opt = Array.from(tagSelect.options).find(x => x.value === t.id);
+                    if (opt) opt.selected = true;
+                    renderBadges();
+                    tagSearch.value = '';
+                    tagDropdown.classList.add('d-none');
+                });
+                item.addEventListener('mouseover', () => item.classList.add('bg-light'));
+                item.addEventListener('mouseout',  () => item.classList.remove('bg-light'));
+                tagDropdown.appendChild(item);
+            });
+        }
+        tagDropdown.classList.remove('d-none');
+    }
+
+    tagSearch.addEventListener('focus', () => renderDropdown(tagSearch.value));
+    tagSearch.addEventListener('input', () => renderDropdown(tagSearch.value));
+    tagSearch.addEventListener('blur',  () => setTimeout(() => tagDropdown.classList.add('d-none'), 150));
+
+    function setSelectedTags(ids) {
+        Array.from(tagSelect.options).forEach(o => { o.selected = ids.includes(o.value); });
+        renderBadges();
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function slugify(str) {
+        return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    document.getElementById('field-title').addEventListener('input', function () {
+        const slugField = document.getElementById('field-slug');
+        if (!slugField.dataset.manual) slugField.value = slugify(this.value);
+    });
+    document.getElementById('field-slug').addEventListener('input', function () {
+        this.dataset.manual = this.value ? 'true' : '';
+    });
+
+    function openNew() {
+        document.getElementById('modal-title').textContent = 'New Post';
+        document.getElementById('item-id').value = '';
+        document.getElementById('item-form').reset();
+        document.getElementById('field-slug').dataset.manual = '';
+        document.getElementById('form-error').classList.add('d-none');
+        setSelectedTags([]);
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    }
+
+    async function editItem(id) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`);
+            const data = await res.json();
+            document.getElementById('modal-title').textContent = 'Edit Post';
+            document.getElementById('item-id').value = data._id;
+            document.getElementById('field-title').value = data.title || '';
+            document.getElementById('field-slug').value = data.slug || '';
+            document.getElementById('field-slug').dataset.manual = 'true';
+            document.getElementById('field-excerpt').value = data.excerpt || '';
+            document.getElementById('field-cover-image').value = data.coverImage || '';
+            document.getElementById('field-status').value = data.status || 'draft';
+            document.getElementById('field-read-time').value = data.readTimeMinutes || '';
+            document.getElementById('field-seo-title').value = data.seoTitle || '';
+            document.getElementById('field-seo-description').value = data.seoDescription || '';
+            const selectedTagIds = (data.tags || []).map(t => (t._id || t).toString());
+            setSelectedTags(selectedTagIds);
+            document.getElementById('form-error').classList.add('d-none');
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+        } catch (err) {
+            alert('Failed to load post data.');
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('item-id').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${BASE_URL}/${id}` : BASE_URL;
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
+        try {
+            const selectedTags = getSelectedTagIds();
+            const titleVal  = document.getElementById('field-title').value.trim();
+            const titleVal = document.getElementById('field-title').value.trim();
+            const payload = {
+                title: titleVal || 'Untitled',
+                slug: document.getElementById('field-slug').value.trim(),
+                excerpt: document.getElementById('field-excerpt').value.trim(),
+                coverImage: document.getElementById('field-cover-image').value.trim(),
+                status: document.getElementById('field-status').value,
+                readTimeMinutes: parseInt(document.getElementById('field-read-time').value) || undefined,
+                tags: selectedTags,
+                seoTitle: document.getElementById('field-seo-title').value.trim(),
+                seoDescription: document.getElementById('field-seo-description').value.trim(),
+            };
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'An error occurred');
+            }
+        } catch (err) {
+            showError('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save';
+        }
+    }
+
+    async function deleteItem(id, name) {
+        if (!confirm(`Delete post "${name || 'this post'}"? This cannot be undone.`)) return;
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Delete failed');
+        }
+    }
+
+    async function toggleFeatured(id, currentlyFeatured) {
+        try {
+            const res = await fetch(`${BASE_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ featured: !currentlyFeatured }),
+            });
+            const data = await res.json();
+            if (data.success) window.location.reload();
+            else alert(data.error || 'Failed to update');
+        } catch (err) {
+            alert('Network error.');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+    }
+</script>
+

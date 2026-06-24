@@ -1,0 +1,88 @@
+/* Applied inside CKEditor's iframe — mirrors blog-view .blog-content styles */
+
+html {
+    background: #f0f2f5;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #354052;
+
+    /* Centered document card */
+    max-width: 780px;
+    margin: 2rem auto 4rem;
+    padding: 2.5rem 3rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5rem;
+    margin-bottom: .75rem;
+    font-weight: 600;
+    color: #1a2332;
+}
+
+p { margin-bottom: 1rem; }
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1rem auto;
+    border-radius: 4px;
+}
+
+pre {
+    background: #f4f6fa;
+    border-radius: .375rem;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+}
+
+blockquote {
+    border-left: 4px solid #f59f00;
+    padding-left: 1rem;
+    color: #666;
+    margin: 1rem 0;
+}
+
+ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+}
+table th, table td {
+    border: 1px solid #dee2e6;
+    padding: .5rem .75rem;
+}
+table th { background: #f8f9fa; font-weight: 600; }
+
+.alert {
+    padding: .75rem 1rem;
+    border-radius: .375rem;
+    margin: 1rem 0;
+    background: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+}
+
+.verses {
+    background: #f8f9fa;
+    border-radius: .375rem;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-style: italic;
+    margin: 1rem 0;
+}
+
+details summary { cursor: pointer; }
+.ratio { margin: 1rem 0; }
+a { color: #0054a6; }

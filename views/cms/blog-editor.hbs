@@ -1,0 +1,163 @@
+{{! Full-page distraction-free blog content editor }}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}} — Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; background: #f8f9fa; }
+
+        /* Top bar */
+        #editor-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 52px;
+            background: #fff;
+            border-bottom: 1px solid #e6e7e9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 16px;
+            z-index: 1000;
+        }
+        #editor-bar .post-title {
+            flex: 1;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #354052;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #editor-bar .status-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        #editor-bar .status-badge.published { background: #d1fae5; color: #065f46; }
+
+        /* CKEditor wrapper — fills below top bar */
+        #editor-wrap {
+            position: fixed;
+            top: 52px; left: 0; right: 0; bottom: 0;
+            background: #f0f2f5;
+        }
+
+        /* Strip CKEditor's own borders/chrome so it blends in */
+        .cke { border: none !important; box-shadow: none !important; }
+        .cke_top { border-bottom: 1px solid #e6e7e9 !important; background: #fff !important; }
+        .cke_bottom { display: none !important; }
+
+        /* Save indicator */
+        #save-status {
+            font-size: 0.8rem;
+            color: #6c757d;
+            min-width: 80px;
+            text-align: right;
+        }
+        #save-status.saving { color: #f59f00; }
+        #save-status.saved  { color: #2fb344; }
+        #save-status.error  { color: #d63939; }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="editor-bar">
+    <a href="/blog/{{item._id}}/view" class="btn btn-sm btn-ghost-secondary" title="Back to post">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </a>
+    <span class="post-title">{{item.title}}</span>
+    <span id="save-status"></span>
+    <button id="btn-save" class="btn btn-sm btn-primary">Save</button>
+</div>
+
+<!-- Editor fills rest of page -->
+<div id="editor-wrap">
+    <textarea id="editor-content">{{item.content}}</textarea>
+</div>
+
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script>
+    const POST_ID = '{{item._id}}';
+    const saveStatus = document.getElementById('save-status');
+
+    const editor = CKEDITOR.replace('editor-content', {
+        height: '100%',
+        uploadUrl: '/blog/upload-image',
+        filebrowserUploadUrl: '/blog/upload-image',
+        removePlugins: 'exportpdf,exportword,uploadimage',
+        resize_enabled: false,
+        versionCheck: false,
+        contentsCss: ['/static/blog-editor-content.css'],
+        toolbar: [
+            { name: 'undo',        items: ['Undo', 'Redo'] },
+            { name: 'source',      items: ['Source'] },
+            { name: 'styles',      items: ['Format', 'Font', 'FontSize'] },
+            { name: 'colors',      items: ['TextColor', 'BGColor'] },
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+            { name: 'paragraph',   items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+            { name: 'insert',      items: ['Image', 'Table', 'HorizontalRule', 'Link', 'Unlink', 'SpecialChar'] },
+        ],
+    });
+
+    // Make the editing area fill the full height after CKEditor renders
+    function resizeEditor() {
+        const available = window.innerHeight - 52; // minus top bar
+        const toolbar   = document.querySelector('.cke_top');
+        const toolbarH  = toolbar ? toolbar.offsetHeight : 0;
+        const contentsH = available - toolbarH;
+        const contents  = document.querySelector('.cke_contents');
+        if (contents) contents.style.height = contentsH + 'px';
+    }
+
+    editor.on('instanceReady', () => {
+        resizeEditor();
+        window.addEventListener('resize', resizeEditor);
+    });
+
+    async function save() {
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true;
+        saveStatus.textContent = 'Saving…';
+        saveStatus.className = 'saving';
+        try {
+            const res = await fetch('/blog/' + POST_ID, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: editor.getData() }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                saveStatus.textContent = 'Saved';
+                saveStatus.className = 'saved';
+                setTimeout(() => { saveStatus.textContent = ''; saveStatus.className = ''; }, 2500);
+            } else {
+                saveStatus.textContent = data.error || 'Error';
+                saveStatus.className = 'error';
+            }
+        } catch {
+            saveStatus.textContent = 'Network error';
+            saveStatus.className = 'error';
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    document.getElementById('btn-save').addEventListener('click', save);
+
+    // Ctrl/Cmd+S to save
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); save(); }
+    });
+</script>
+</body>
+</html>
