@@ -1,10 +1,77 @@
+<style>
+    /* ── Dashboard (neutral / no accents) ─────────────────────────────── */
+    .dash-card {
+        border: 1px solid var(--tblr-border-color);
+        transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .dash-card:hover {
+        border-color: var(--tblr-gray-400);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+    }
+    .dash-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface-secondary);
+        color: var(--tblr-secondary);
+        font-size: 20px;
+    }
+    .dash-kpi {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -.02em;
+    }
+    .dash-progress {
+        height: 4px;
+        background: var(--tblr-bg-surface-secondary);
+    }
+    .dash-progress .progress-bar {
+        background: var(--tblr-gray-600);
+    }
+    .dash-subheader {
+        font-size: .6875rem;
+        font-weight: 600;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--tblr-secondary);
+    }
+    .dash-action {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--tblr-border-color);
+        color: var(--tblr-body-color);
+        text-decoration: none;
+        transition: border-color .15s ease, background .15s ease;
+    }
+    .dash-action:hover {
+        border-color: var(--tblr-gray-400);
+        background: var(--tblr-bg-surface-secondary);
+        color: var(--tblr-body-color);
+    }
+    .dash-action .ti {
+        font-size: 20px;
+        color: var(--tblr-secondary);
+    }
+</style>
+
 <!-- Page header -->
 <div class="page-header d-print-none">
     <div class="container-xl">
         <div class="row g-2 align-items-center">
             <div class="col">
-                <div class="page-pretitle">Overview</div>
-                <h2 class="page-title">Dashboard</h2>
+                <div class="page-pretitle"><span id="dash-greeting">Welcome back</span></div>
+                <h2 class="page-title">{{#if userName}}{{userName}}{{else}}Dashboard{{/if}}</h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="text-secondary" id="dash-date"></div>
             </div>
         </div>
     </div>
@@ -18,130 +85,152 @@
 
             <!-- Blog Posts -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card">
+                <div class="card dash-card">
                     <div class="card-body">
-                        <div class="subheader mb-2">Blog Posts</div>
-                        <div class="h1 mb-3">{{stats.blogTotal}}</div>
-                        <div class="d-flex mb-2">
-                            <div>{{stats.blogPublished}} published</div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="dash-subheader">Blog Posts</span>
+                            <span class="dash-icon"><i class="ti ti-article"></i></span>
                         </div>
-                        <div class="progress progress-sm">
-                            <div class="progress-bar bg-blue" style="width: {{#if stats.blogTotal}}{{percentage stats.blogPublished stats.blogTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        <div class="dash-kpi mb-2">{{stats.blogTotal}}</div>
+                        <div class="d-flex align-items-center justify-content-between text-secondary small mb-2">
+                            <span>{{stats.blogPublished}} published</span>
+                            <span>{{#if stats.blogTotal}}{{percentage stats.blogPublished stats.blogTotal}}{{else}}0{{/if}}%</span>
+                        </div>
+                        <div class="progress dash-progress">
+                            <div class="progress-bar" style="width: {{#if stats.blogTotal}}{{percentage stats.blogPublished stats.blogTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
                         </div>
                     </div>
-                    <div class="card-footer"><a href="/blog" class="btn btn-sm btn-outline-primary w-100">Manage Posts</a></div>
+                    <div class="card-footer"><a href="/blog" class="btn btn-sm btn-outline-secondary w-100">Manage Posts</a></div>
                 </div>
             </div>
 
             <!-- Projects -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card">
+                <div class="card dash-card">
                     <div class="card-body">
-                        <div class="subheader mb-2">Projects</div>
-                        <div class="h1 mb-3">{{stats.projectTotal}}</div>
-                        <div class="d-flex mb-2">
-                            <div>{{stats.projectPublished}} published</div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="dash-subheader">Projects</span>
+                            <span class="dash-icon"><i class="ti ti-folder"></i></span>
                         </div>
-                        <div class="progress progress-sm">
-                            <div class="progress-bar bg-green" style="width: {{#if stats.projectTotal}}{{percentage stats.projectPublished stats.projectTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        <div class="dash-kpi mb-2">{{stats.projectTotal}}</div>
+                        <div class="d-flex align-items-center justify-content-between text-secondary small mb-2">
+                            <span>{{stats.projectPublished}} published</span>
+                            <span>{{#if stats.projectTotal}}{{percentage stats.projectPublished stats.projectTotal}}{{else}}0{{/if}}%</span>
+                        </div>
+                        <div class="progress dash-progress">
+                            <div class="progress-bar" style="width: {{#if stats.projectTotal}}{{percentage stats.projectPublished stats.projectTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
                         </div>
                     </div>
-                    <div class="card-footer"><a href="/projects" class="btn btn-sm btn-outline-primary w-100">Manage Projects</a></div>
+                    <div class="card-footer"><a href="/projects" class="btn btn-sm btn-outline-secondary w-100">Manage Projects</a></div>
                 </div>
             </div>
 
             <!-- Subscribers -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card">
+                <div class="card dash-card">
                     <div class="card-body">
-                        <div class="subheader mb-2">Subscribers</div>
-                        <div class="h1 mb-3">{{stats.subscriberTotal}}</div>
-                        <div class="d-flex mb-2">
-                            <div>{{stats.subscriberActive}} active</div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="dash-subheader">Subscribers</span>
+                            <span class="dash-icon"><i class="ti ti-users"></i></span>
                         </div>
-                        <div class="progress progress-sm">
-                            <div class="progress-bar bg-cyan" style="width: {{#if stats.subscriberTotal}}{{percentage stats.subscriberActive stats.subscriberTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        <div class="dash-kpi mb-2">{{stats.subscriberTotal}}</div>
+                        <div class="d-flex align-items-center justify-content-between text-secondary small mb-2">
+                            <span>{{stats.subscriberActive}} active</span>
+                            <span>{{#if stats.subscriberTotal}}{{percentage stats.subscriberActive stats.subscriberTotal}}{{else}}0{{/if}}%</span>
+                        </div>
+                        <div class="progress dash-progress">
+                            <div class="progress-bar" style="width: {{#if stats.subscriberTotal}}{{percentage stats.subscriberActive stats.subscriberTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
                         </div>
                     </div>
-                    <div class="card-footer"><a href="/subscribers" class="btn btn-sm btn-outline-primary w-100">Manage Subscribers</a></div>
+                    <div class="card-footer"><a href="/subscribers" class="btn btn-sm btn-outline-secondary w-100">Manage Subscribers</a></div>
                 </div>
             </div>
 
             <!-- Newsletters -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card">
+                <div class="card dash-card">
                     <div class="card-body">
-                        <div class="subheader mb-2">Newsletters</div>
-                        <div class="h1 mb-3">{{stats.newsletterTotal}}</div>
-                        <div class="d-flex mb-2">
-                            <div>{{stats.newsletterSent}} sent</div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="dash-subheader">Newsletters</span>
+                            <span class="dash-icon"><i class="ti ti-mail"></i></span>
                         </div>
-                        <div class="progress progress-sm">
-                            <div class="progress-bar bg-orange" style="width: {{#if stats.newsletterTotal}}{{percentage stats.newsletterSent stats.newsletterTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
+                        <div class="dash-kpi mb-2">{{stats.newsletterTotal}}</div>
+                        <div class="d-flex align-items-center justify-content-between text-secondary small mb-2">
+                            <span>{{stats.newsletterSent}} sent</span>
+                            <span>{{#if stats.newsletterTotal}}{{percentage stats.newsletterSent stats.newsletterTotal}}{{else}}0{{/if}}%</span>
+                        </div>
+                        <div class="progress dash-progress">
+                            <div class="progress-bar" style="width: {{#if stats.newsletterTotal}}{{percentage stats.newsletterSent stats.newsletterTotal}}{{else}}0{{/if}}%" role="progressbar"></div>
                         </div>
                     </div>
-                    <div class="card-footer"><a href="/newsletters" class="btn btn-sm btn-outline-primary w-100">Manage Newsletters</a></div>
+                    <div class="card-footer"><a href="/newsletters" class="btn btn-sm btn-outline-secondary w-100">Manage Newsletters</a></div>
                 </div>
             </div>
 
         </div>
 
-        <!-- Secondary Stats -->
+        <!-- Secondary stats + quick actions -->
         <div class="row row-deck row-cards">
 
-            <div class="col-sm-4">
-                <div class="card card-sm">
+            <!-- Portfolio content -->
+            <div class="col-lg-8">
+                <div class="card dash-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Portfolio content</h3>
+                    </div>
                     <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <span class="bg-azure text-white avatar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2"/></svg>
-                                </span>
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                <a href="/work-experience" class="dash-action h-100">
+                                    <i class="ti ti-briefcase"></i>
+                                    <div>
+                                        <div class="dash-kpi" style="font-size:1.5rem">{{stats.workExpTotal}}</div>
+                                        <div class="text-secondary small">Work Experience</div>
+                                    </div>
+                                </a>
                             </div>
-                            <div class="col">
-                                <div class="font-weight-medium">{{stats.workExpTotal}} Work Experience</div>
-                                <div class="text-secondary">Roles on your portfolio</div>
+                            <div class="col-sm-4">
+                                <a href="/skills" class="dash-action h-100">
+                                    <i class="ti ti-stack-2"></i>
+                                    <div>
+                                        <div class="dash-kpi" style="font-size:1.5rem">{{stats.skillTotal}}</div>
+                                        <div class="text-secondary small">Skills</div>
+                                    </div>
+                                </a>
                             </div>
-                            <div class="col-auto"><a href="/work-experience" class="btn btn-sm btn-outline-secondary">Manage</a></div>
+                            <div class="col-sm-4">
+                                <a href="/testimonials" class="dash-action h-100">
+                                    <i class="ti ti-quote"></i>
+                                    <div>
+                                        <div class="dash-kpi" style="font-size:1.5rem">{{stats.testimonialTotal}}</div>
+                                        <div class="text-secondary small">Testimonials</div>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-sm-4">
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <span class="bg-green text-white avatar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></svg>
-                                </span>
-                            </div>
-                            <div class="col">
-                                <div class="font-weight-medium">{{stats.skillTotal}} Skills</div>
-                                <div class="text-secondary">Listed on your portfolio</div>
-                            </div>
-                            <div class="col-auto"><a href="/skills" class="btn btn-sm btn-outline-secondary">Manage</a></div>
-                        </div>
+            <!-- Quick actions -->
+            <div class="col-lg-4">
+                <div class="card dash-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick actions</h3>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-sm-4">
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <span class="bg-yellow text-white avatar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/></svg>
-                                </span>
-                            </div>
-                            <div class="col">
-                                <div class="font-weight-medium">{{stats.testimonialTotal}} Testimonials</div>
-                                <div class="text-secondary">From colleagues &amp; clients</div>
-                            </div>
-                            <div class="col-auto"><a href="/testimonials" class="btn btn-sm btn-outline-secondary">Manage</a></div>
-                        </div>
+                    <div class="list-group list-group-flush">
+                        <a href="/blog" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                            <i class="ti ti-pencil-plus text-secondary"></i> New blog post
+                        </a>
+                        <a href="/projects" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                            <i class="ti ti-folder-plus text-secondary"></i> New project
+                        </a>
+                        <a href="/newsletters" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                            <i class="ti ti-send text-secondary"></i> New newsletter
+                        </a>
+                        <a href="/subscribers" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                            <i class="ti ti-users text-secondary"></i> View subscribers
+                        </a>
                     </div>
                 </div>
             </div>
@@ -150,3 +239,14 @@
 
     </div>
 </div>
+
+<script>
+    (function () {
+        var h = new Date().getHours();
+        var greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+        var g = document.getElementById('dash-greeting');
+        if (g) g.textContent = greet;
+        var d = document.getElementById('dash-date');
+        if (d) d.textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    })();
+</script>

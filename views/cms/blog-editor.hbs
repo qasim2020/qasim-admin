@@ -119,11 +119,7 @@
         if (contents) contents.style.height = contentsH + 'px';
     }
 
-    editor.on('instanceReady', () => {
-        resizeEditor();
-        window.addEventListener('resize', resizeEditor);
-    });
-
+    // ── Save ─────────────────────────────────────────────────────────────────
     async function save() {
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
@@ -137,6 +133,7 @@
             });
             const data = await res.json();
             if (data.success) {
+                lastSavedContent = editor.getData().trim();
                 saveStatus.textContent = 'Saved';
                 saveStatus.className = 'saved';
                 setTimeout(() => { saveStatus.textContent = ''; saveStatus.className = ''; }, 2500);
@@ -154,9 +151,62 @@
 
     document.getElementById('btn-save').addEventListener('click', save);
 
-    // Ctrl/Cmd+S to save
+    // Cmd/Ctrl+S
     document.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); save(); }
+    });
+
+    // Cmd/Ctrl+S inside the CKEditor iframe
+    editor.on('contentDom', () => {
+        editor.document.on('keydown', e => {
+            const ke = e.data.$;
+            if ((ke.ctrlKey || ke.metaKey) && ke.key === 's') {
+                ke.preventDefault();
+                save();
+            }
+        });
+    });
+
+    // ── Autosave — 3 s after user stops typing ───────────────────────────────
+    let autoSaveTimer = null;
+    let lastSavedContent = '';
+
+    function scheduleAutosave() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(async () => {
+            const current = editor.getData();
+            if (current.trim() === lastSavedContent) return;
+            saveStatus.textContent = 'Autosaving…';
+            saveStatus.className = 'saving';
+            try {
+                const res = await fetch('/blog/' + POST_ID, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: current }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    lastSavedContent = current.trim();
+                    saveStatus.textContent = 'Autosaved';
+                    saveStatus.className = 'saved';
+                    setTimeout(() => { saveStatus.textContent = ''; saveStatus.className = ''; }, 2000);
+                } else {
+                    saveStatus.textContent = 'Autosave failed';
+                    saveStatus.className = 'error';
+                }
+            } catch {
+                saveStatus.textContent = 'Autosave error';
+                saveStatus.className = 'error';
+            }
+        }, 3000);
+    }
+
+    editor.on('instanceReady', () => {
+        lastSavedContent = editor.getData().trim();
+        resizeEditor();
+        window.addEventListener('resize', resizeEditor);
+        editor.on('change', scheduleAutosave);
+        editor.on('afterCommandExec', scheduleAutosave);
     });
 </script>
 </body>

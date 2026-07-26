@@ -351,17 +351,30 @@
         this.dataset.manual = this.value ? 'true' : '';
     });
 
-    function openNew() {
-        document.getElementById('modal-title').textContent = 'New Post';
-        document.getElementById('item-id').value = '';
-        document.getElementById('item-form').reset();
-        document.getElementById('field-slug').dataset.manual = '';
-        document.getElementById('form-error').classList.add('d-none');
-        setSelectedTags([]);
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
+    window.openNew = function openNew() {
+        const btn = document.querySelector('[onclick="openNew()"]');
+        if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+        fetch('/blog', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: 'Untitled', slug: 'untitled-' + Date.now(), status: 'draft' }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.item?._id) {
+                window.location.href = '/blog/' + data.item._id + '/edit';
+            } else {
+                alert(data.error || 'Could not create post');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg> New Post'; }
+            }
+        })
+        .catch(() => {
+            alert('Network error');
+            if (btn) { btn.disabled = false; }
+        });
     }
 
-    async function editItem(id) {
+    window.editItem = async function editItem(id) {
         try {
             const res = await fetch(`${BASE_URL}/${id}`);
             const data = await res.json();
@@ -385,7 +398,7 @@
         }
     }
 
-    async function submitForm(e) {
+    window.submitForm = async function submitForm(e) {
         e.preventDefault();
         const id = document.getElementById('item-id').value;
         const method = id ? 'PUT' : 'POST';
@@ -396,7 +409,6 @@
 
         try {
             const selectedTags = getSelectedTagIds();
-            const titleVal  = document.getElementById('field-title').value.trim();
             const titleVal = document.getElementById('field-title').value.trim();
             const payload = {
                 title: titleVal || 'Untitled',
@@ -428,7 +440,7 @@
         }
     }
 
-    async function deleteItem(id, name) {
+    window.deleteItem = async function deleteItem(id, name) {
         if (!confirm(`Delete post "${name || 'this post'}"? This cannot be undone.`)) return;
         const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
         const data = await res.json();

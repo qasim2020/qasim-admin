@@ -2,8 +2,8 @@
  * convert-markup-to-html.js
  *
  * Converts every blog's custom line-based markup into proper HTML and saves
- * the result in the `contentHtml` field. The original `content` field is
- * left untouched so the editor can continue to work with the raw markup.
+ * the result back into the `content` field (in-place). Blogs whose content is
+ * already HTML are skipped unless FORCE=1 is set.
  *
  * Markup format (one line per element):
  *   h1: Title
@@ -52,24 +52,25 @@ const FORCE       = process.env.FORCE   === '1';
 async function run() {
     await mongoose.connect(DB_URL);
     console.log(`Connected → ${DB_URL}`);
-    console.log(DRY_RUN ? '[DRY RUN]' : FORCE ? '[FORCE – reconverting all]' : '[Normal – only missing contentHtml]');
+    console.log(DRY_RUN ? '[DRY RUN]' : FORCE ? '[FORCE – reconverting all]' : '[Normal – only raw-markup blogs]');
     if (IMAGE_BASE) console.log(`Image base URL: ${IMAGE_BASE}`);
 
-    const filter = FORCE
-        ? {}
-        : { $or: [{ contentHtml: { $exists: false } }, { contentHtml: null }, { contentHtml: '' }] };
-
-    const blogs = await Blog.find(filter, '_id title content').lean();
-    console.log(`\nBlogs to convert: ${blogs.length}\n`);
+    const blogs = await Blog.find({ content: { $exists: true, $ne: '' } }, '_id title content').lean();
+    console.log(`\nBlogs found: ${blogs.length}\n`);
 
     let ok = 0, skipped = 0, errors = 0;
 
     for (const blog of blogs) {
         try {
+            const isHtml = /<\/(p|h[1-6]|div|ul|blockquote|pre|table)>/i.test(blog.content || '');
+            if (isHtml && !FORCE) {
+                skipped++;
+                continue;
+            }
             const html = markupToHtml(blog.content);
             console.log(`  [${DRY_RUN ? 'DRY' : 'OK'}]  ${blog._id}  "${(blog.title || '').slice(0, 60)}"`);
             if (!DRY_RUN) {
-                await Blog.updateOne({ _id: blog._id }, { $set: { contentHtml: html } });
+                await Blog.updateOne({ _id: blog._id }, { $set: { content: html } });
             }
             ok++;
         } catch (err) {
