@@ -13,14 +13,14 @@
             </div>
             <!-- Search bar -->
             <div class="col-auto">
-                <form method="GET" action="/blog">
+                <form method="GET" action="/blogs">
                     <div class="input-group">
                         <input type="text" name="q" class="form-control"
                             placeholder="Search by title…"
                             value="{{pagination.q}}"
                             style="min-width:220px;">
                         {{#if pagination.q}}
-                        <a href="/blog" class="btn btn-outline-secondary" title="Clear search">×</a>
+                        <a href="/blogs" class="btn btn-outline-secondary" title="Clear search">×</a>
                         {{/if}}
                     </div>
                 </form>
@@ -95,7 +95,7 @@
                                     data-featured="{{this.featured}}"
                                     onclick="toggleFeatured(this.dataset.id, this.dataset.featured === 'true')"
                                     title="{{#if this.featured}}Remove from featured{{else}}Mark as featured{{/if}}">★</button>
-                                <a href="/blog/{{this._id}}/view" class="btn btn-sm btn-outline-secondary">View</a>
+                                <a href="/blogs/{{this._id}}/view" class="btn btn-sm btn-outline-secondary">View</a>
                                 <button class="btn btn-sm btn-outline-primary"
                                     data-id="{{this._id}}"
                                     onclick="editItem(this.dataset.id)">Edit</button>
@@ -119,7 +119,7 @@
             </div>
             <ul class="pagination mb-0">
                 <li class="page-item {{#unless pagination.hasPrev}}disabled{{/unless}}">
-                    <a class="page-link" href="/blog?page={{pagination.prevPage}}&q={{pagination.q}}">
+                    <a class="page-link" href="/blogs?page={{pagination.prevPage}}&q={{pagination.q}}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
                             stroke-linejoin="round">
@@ -134,12 +134,12 @@
                 <li class="page-item disabled"><span class="page-link">…</span></li>
                 {{else}}
                 <li class="page-item {{#if this.active}}active{{/if}}">
-                    <a class="page-link" href="/blog?page={{this.num}}&q={{../pagination.q}}">{{this.num}}</a>
+                    <a class="page-link" href="/blogs?page={{this.num}}&q={{../pagination.q}}">{{this.num}}</a>
                 </li>
                 {{/if}}
                 {{/each}}
                 <li class="page-item {{#unless pagination.hasNext}}disabled{{/unless}}">
-                    <a class="page-link" href="/blog?page={{pagination.nextPage}}&q={{pagination.q}}">
+                    <a class="page-link" href="/blogs?page={{pagination.nextPage}}&q={{pagination.q}}">
                         next
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -162,7 +162,7 @@
                     <p class="empty-title">No posts match &ldquo;{{pagination.q}}&rdquo;</p>
                     <p class="empty-subtitle text-secondary">Try a different search term.</p>
                     <div class="empty-action">
-                        <a href="/blog" class="btn btn-secondary">Clear search</a>
+                        <a href="/blogs" class="btn btn-secondary">Clear search</a>
                     </div>
                     {{else}}
                     <p class="empty-title">No blog posts yet</p>
@@ -261,7 +261,7 @@
 </div>
 
 <script>
-    const BASE_URL = '/blog';
+    const BASE_URL   = '/blogs';
 
     // ── Tag Badge Picker ──────────────────────────────────────────────────────
     const tagSelect     = document.getElementById('field-tags');
@@ -354,15 +354,16 @@
     window.openNew = function openNew() {
         const btn = document.querySelector('[onclick="openNew()"]');
         if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
-        fetch('/blog', {
+        fetch('/blogs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title: 'Untitled', slug: 'untitled-' + Date.now(), status: 'draft' }),
+
         })
         .then(r => r.json())
         .then(data => {
             if (data.success && data.item?._id) {
-                window.location.href = '/blog/' + data.item._id + '/edit';
+                window.location.href = '/blogs/' + data.item._id + '/edit';
             } else {
                 alert(data.error || 'Could not create post');
                 if (btn) { btn.disabled = false; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg> New Post'; }

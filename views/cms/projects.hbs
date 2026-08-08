@@ -103,16 +103,16 @@
 
 <!-- Modal -->
 <div class="modal modal-blur fade" id="modal-form" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-title">New Project</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="item-form" onsubmit="submitForm(event)">
+            <div class="modal-body">
+                <form id="item-form" onsubmit="submitForm(event)">
                 <input type="hidden" id="item-id">
-                <div class="modal-body">
-                    <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+                <div id="form-error" class="alert alert-danger d-none mb-3"></div>
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label required">Title</label>
@@ -142,8 +142,8 @@
                                 placeholder="React, Node.js, PostgreSQL">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Cover Image URL</label>
-                            <input type="url" id="field-cover-image" class="form-control" placeholder="https://...">
+                            <label class="form-label">Cover Image</label>
+                            {{> coverImageUpload}}
                         </div>
                         <div class="col-6">
                             <label class="form-label">GitHub URL</label>
@@ -175,18 +175,20 @@
                             <input type="text" id="field-seo-description" class="form-control">
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="item-form" id="save-btn" class="btn btn-primary">Save</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    const BASE_URL = '/projects';
+    const BASE_URL   = '/projects';
+    const UPLOAD_URL = '/projects/upload-image';
+    const DELETE_URL = '/blogs/delete-image';
 
     function slugify(str) {
         return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -207,6 +209,7 @@
         document.getElementById('field-slug').dataset.manual = '';
         document.getElementById('field-order').value = '0';
         document.getElementById('form-error').classList.add('d-none');
+        coverSetPreview('', '');
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
     }
 
@@ -223,6 +226,7 @@
             document.getElementById('field-content').value = data.content || '';
             document.getElementById('field-tech-stack').value = (data.techStack || []).join(', ');
             document.getElementById('field-cover-image').value = data.coverImage || '';
+            coverSetPreview(data.coverImage || '', '');
             document.getElementById('field-github-url').value = data.githubUrl || '';
             document.getElementById('field-live-url').value = data.liveUrl || '';
             document.getElementById('field-status').value = data.status || 'draft';
@@ -297,4 +301,76 @@
         el.textContent = msg;
         el.classList.remove('d-none');
     }
+
+    // ── Cover image upload widget ─────────────────────────────────────────────
+    function coverSetPreview(url, publicId) {
+        const box   = document.getElementById('cover-upload-box');
+        const img   = document.getElementById('cover-preview');
+        const ph    = document.getElementById('cover-placeholder');
+        document.getElementById('field-cover-image').value = url;
+        document.getElementById('cover-public-id').value   = publicId || '';
+        if (url) {
+            img.src = url; img.style.display = ''; ph.style.display = 'none';
+            box.classList.add('has-image');
+        } else {
+            img.src = ''; img.style.display = 'none'; ph.style.display = '';
+            box.classList.remove('has-image');
+        }
+    }
+
+    function coverUploadClick(e) {
+        if (e.target.closest('.cover-remove')) return;
+        document.getElementById('cover-file-input').click();
+    }
+    window.coverUploadClick  = coverUploadClick;
+
+    async function coverRemove(e) {
+        e.stopPropagation();
+        const publicId = document.getElementById('cover-public-id').value;
+        if (publicId) {
+            fetch(DELETE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ publicId }),
+            }).catch(() => {});
+        }
+        coverSetPreview('', '');
+    }
+    window.coverRemove       = coverRemove;
+
+    async function coverFileSelected(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        e.target.value = '';
+        const box     = document.getElementById('cover-upload-box');
+        const spinner = document.getElementById('cover-spinner');
+        box.classList.add('uploading');
+        spinner.style.display = 'flex';
+        // Delete old image first
+        const oldId = document.getElementById('cover-public-id').value;
+        if (oldId) {
+            await fetch(DELETE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ publicId: oldId }),
+            }).catch(() => {});
+        }
+        const fd = new FormData();
+        fd.append('upload', file);
+        try {
+            const res  = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.url) {
+                coverSetPreview(data.url, data.publicId || '');
+            } else {
+                alert('Upload failed');
+            }
+        } catch {
+            alert('Upload error');
+        } finally {
+            box.classList.remove('uploading');
+            spinner.style.display = 'none';
+        }
+    }
+    window.coverFileSelected = coverFileSelected;
 </script>

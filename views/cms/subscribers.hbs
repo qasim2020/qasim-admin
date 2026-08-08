@@ -5,6 +5,7 @@
                 <h2 class="page-title">Subscribers</h2>
                 <div class="text-secondary mt-1">
                     {{counts.total}} total · {{counts.active}} active · {{counts.unsubscribed}} unsubscribed
+                    {{#if (gt pagination.totalPages 1)}} · Showing {{pagination.from}}–{{pagination.to}}{{/if}}
                 </div>
             </div>
             <div class="col-auto ms-auto d-print-none">
@@ -67,6 +68,35 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination -->
+            {{#if (gt pagination.totalPages 1)}}
+            <div class="d-flex align-items-center justify-content-between px-3 py-2">
+                <div class="text-secondary small">Page {{pagination.page}} of {{pagination.totalPages}}</div>
+                <ul class="pagination mb-0">
+                    <li class="page-item {{#unless pagination.hasPrev}}disabled{{/unless}}">
+                        <a class="page-link" href="/subscribers?page={{pagination.prevPage}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18"/></svg>
+                            prev
+                        </a>
+                    </li>
+                    {{#each pagination.pages}}
+                    {{#if this.ellipsis}}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {{else}}
+                    <li class="page-item {{#if this.active}}active{{/if}}">
+                        <a class="page-link" href="/subscribers?page={{this.num}}">{{this.num}}</a>
+                    </li>
+                    {{/if}}
+                    {{/each}}
+                    <li class="page-item {{#unless pagination.hasNext}}disabled{{/unless}}">
+                        <a class="page-link" href="/subscribers?page={{pagination.nextPage}}">
+                            next
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18"/></svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            {{/if}}
             {{else}}
             <div class="card-body">
                 <div class="empty">

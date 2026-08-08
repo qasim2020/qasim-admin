@@ -8,15 +8,16 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
+const makeStorage = (folder) => new CloudinaryStorage({
     cloudinary,
     params: {
-        folder:         process.env.CLOUDINARY_FOLDER || 'qurandaily',
+        folder,
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
         transformation: [{ quality: 'auto', fetch_format: 'auto' }],
     },
 });
 
-const upload = multer({ storage });
+const upload         = multer({ storage: makeStorage(process.env.CLOUDINARY_FOLDER || 'qurandaily') });
+const uploadProjects = multer({ storage: makeStorage('qasim/projects') });
 
-module.exports = { cloudinary, upload };
+module.exports = { cloudinary, upload, uploadProjects };

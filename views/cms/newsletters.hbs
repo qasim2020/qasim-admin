@@ -3,7 +3,13 @@
         <div class="row g-2 align-items-center">
             <div class="col">
                 <h2 class="page-title">Newsletters</h2>
-                <div class="text-secondary mt-1">{{items.length}} campaign{{#if (neq items.length 1)}}s{{/if}}</div>
+                <div class="text-secondary mt-1">
+                    {{#if (gt pagination.totalPages 1)}}
+                    Showing {{pagination.from}}–{{pagination.to}} of {{pagination.total}} campaign{{#if (neq pagination.total 1)}}s{{/if}}
+                    {{else}}
+                    {{pagination.total}} campaign{{#if (neq pagination.total 1)}}s{{/if}}
+                    {{/if}}
+                </div>
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <button class="btn btn-primary" onclick="openNew()">
@@ -52,8 +58,8 @@
                             <td class="text-secondary">{{this.recipientCount}}</td>
                             <td>
                                 <div class="btn-list flex-nowrap">
-                                    <button class="btn btn-sm btn-outline-primary"
-                                        onclick="editItem('{{this._id}}')">Edit</button>
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                        onclick="editItem('{{this._id}}')">View</button>
                                     <button class="btn btn-sm btn-outline-danger"
                                         onclick="deleteItem('{{this._id}}', '{{this.title}}')">Delete</button>
                                 </div>
@@ -63,6 +69,35 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination -->
+            {{#if (gt pagination.totalPages 1)}}
+            <div class="d-flex align-items-center justify-content-between px-3 py-2">
+                <div class="text-secondary small">Page {{pagination.page}} of {{pagination.totalPages}}</div>
+                <ul class="pagination mb-0">
+                    <li class="page-item {{#unless pagination.hasPrev}}disabled{{/unless}}">
+                        <a class="page-link" href="/newsletters?page={{pagination.prevPage}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18"/></svg>
+                            prev
+                        </a>
+                    </li>
+                    {{#each pagination.pages}}
+                    {{#if this.ellipsis}}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {{else}}
+                    <li class="page-item {{#if this.active}}active{{/if}}">
+                        <a class="page-link" href="/newsletters?page={{this.num}}">{{this.num}}</a>
+                    </li>
+                    {{/if}}
+                    {{/each}}
+                    <li class="page-item {{#unless pagination.hasNext}}disabled{{/unless}}">
+                        <a class="page-link" href="/newsletters?page={{pagination.nextPage}}">
+                            next
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18"/></svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            {{/if}}
             {{else}}
             <div class="card-body">
                 <div class="empty">
@@ -117,10 +152,9 @@
                                 placeholder="Short preview shown in email clients">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Email Body (HTML)</label>
-                            <textarea id="field-body-html" class="form-control font-monospace" rows="10"
-                                placeholder="<h1>Hello!</h1><p>Your content here…</p>"></textarea>
-                            <small class="form-hint">Full HTML is supported. Leave blank to send the subject as a simple heading.</small>
+                            <label class="form-label">Email Body</label>
+                            <textarea id="field-body-html"></textarea>
+                            <small class="form-hint">Use the editor to compose the email. Leave blank to send the subject as a simple heading.</small>
                         </div>
                     </div>
                 </div>
@@ -133,8 +167,40 @@
     </div>
 </div>
 
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     const BASE_URL = '/newsletters';
+
+    // ── CKEditor for the email body ──────────────────────────────────────────
+    let bodyEditor = null;
+    CKEDITOR.replace('field-body-html', {
+        height: 320,
+        uploadUrl: '/blogs/upload-image',
+        filebrowserUploadUrl: '/blogs/upload-image',
+        removePlugins: 'exportpdf,exportword,uploadimage',
+        resize_enabled: false,
+        versionCheck: false,
+        contentsCss: ['/static/blog-editor-content.css'],
+        toolbar: [
+            { name: 'undo',        items: ['Undo', 'Redo'] },
+            { name: 'source',      items: ['Source'] },
+            { name: 'styles',      items: ['Format', 'Font', 'FontSize'] },
+            { name: 'colors',      items: ['TextColor', 'BGColor'] },
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+            { name: 'paragraph',   items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+            { name: 'insert',      items: ['Image', 'Table', 'HorizontalRule', 'Link', 'Unlink', 'SpecialChar'] },
+        ],
+    });
+    CKEDITOR.on('instanceReady', function (e) {
+        if (e.editor.name === 'field-body-html') bodyEditor = e.editor;
+    });
+
+    // Allow CKEditor dialogs (Link, Image, Table) to receive focus inside the Bootstrap modal
+    document.addEventListener('focusin', function (e) {
+        if (e.target.closest('.cke_dialog, .cke_dialog_ui_input_text, .cke_dialog_ui_input_textarea')) {
+            e.stopImmediatePropagation();
+        }
+    }, true);
 
     document.getElementById('field-status').addEventListener('change', function () {
         const warning = document.getElementById('send-warning');
@@ -149,6 +215,7 @@
         document.getElementById('modal-title').textContent = 'New Campaign';
         document.getElementById('item-id').value = '';
         document.getElementById('item-form').reset();
+        if (bodyEditor) bodyEditor.setData('');
         document.getElementById('form-error').classList.add('d-none');
         document.getElementById('send-warning').classList.add('d-none');
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form')).show();
@@ -163,7 +230,8 @@
             document.getElementById('field-title').value = data.title || '';
             document.getElementById('field-subject').value = data.subject || '';
             document.getElementById('field-preview-text').value = data.previewText || '';
-            document.getElementById('field-body-html').value = data.bodyHtml || '';
+            if (bodyEditor) bodyEditor.setData(data.bodyHtml || '');
+            else document.getElementById('field-body-html').value = data.bodyHtml || '';
             document.getElementById('field-status').value = data.status || 'draft';
             document.getElementById('form-error').classList.add('d-none');
             document.getElementById('send-warning').classList.add('d-none');
@@ -193,7 +261,7 @@
                 title: document.getElementById('field-title').value.trim(),
                 subject: document.getElementById('field-subject').value.trim(),
                 previewText: document.getElementById('field-preview-text').value.trim(),
-                bodyHtml: document.getElementById('field-body-html').value.trim(),
+                bodyHtml: (bodyEditor ? bodyEditor.getData() : document.getElementById('field-body-html').value).trim(),
                 status: newStatus,
             };
             const res = await fetch(url, {

@@ -2,21 +2,23 @@ const express = require('express');
 const router = express.Router();
 const requireLogin = require('../modules/authenticate');
 const cms = require('../controllers/cmsController');
-const { upload } = require('../config/cloudinary');
+const { upload, uploadProjects } = require('../config/cloudinary');
 
 // ─── Blog ─────────────────────────────────────────────────────────────────────
-router.get('/blog', requireLogin, cms.getBlogPage);
-router.post('/blog', requireLogin, cms.createBlog);
-router.post('/blog/upload-image', requireLogin, upload.single('upload'), cms.uploadImage);
-router.get('/blog/:id/view', requireLogin, cms.getBlogView);
-router.get('/blog/:id/edit', requireLogin, cms.getBlogEditor);
-router.get('/blog/:id', requireLogin, cms.getBlog);
-router.put('/blog/:id', requireLogin, cms.updateBlog);
-router.delete('/blog/:id', requireLogin, cms.deleteBlog);
+router.get('/blogs', requireLogin, cms.getBlogPage);
+router.post('/blogs', requireLogin, cms.createBlog);
+router.post('/blogs/upload-image', requireLogin, upload.single('upload'), cms.uploadImage);
+router.post('/blogs/delete-image', requireLogin, cms.deleteImage);
+router.get('/blogs/:id/view', requireLogin, cms.getBlogView);
+router.get('/blogs/:id/edit', requireLogin, cms.getBlogEditor);
+router.get('/blogs/:id', requireLogin, cms.getBlog);
+router.put('/blogs/:id', requireLogin, cms.updateBlog);
+router.delete('/blogs/:id', requireLogin, cms.deleteBlog);
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
 router.get('/projects', requireLogin, cms.getProjectsPage);
 router.post('/projects', requireLogin, cms.createProject);
+router.post('/projects/upload-image', requireLogin, uploadProjects.single('upload'), cms.uploadImage);
 router.get('/projects/:id', requireLogin, cms.getProject);
 router.put('/projects/:id', requireLogin, cms.updateProject);
 router.delete('/projects/:id', requireLogin, cms.deleteProject);

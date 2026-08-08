@@ -5,7 +5,7 @@
             <!-- Back link + title -->
             <div class="col">
                 <div class="mb-1">
-                    <a href="/blog" class="text-secondary small">
+                    <a href="/blogs" class="text-secondary small">
                         ← All posts
                     </a>
                 </div>
@@ -41,7 +41,7 @@
             <!-- Action buttons -->
             <div class="col-auto d-print-none">
                 <div class="btn-list">
-                    <a href="/blog/{{item._id}}/edit" class="btn btn-outline-secondary">
+                    <a href="/blogs/{{item._id}}/edit" class="btn btn-outline-secondary">
                         Edit Content
                     </a>
                     <button class="btn btn-outline-primary" onclick="openEdit()">
@@ -269,7 +269,7 @@
                 seoTitle:       document.getElementById('field-seo-title').value.trim(),
                 seoDescription: document.getElementById('field-seo-description').value.trim(),
             };
-            const res  = await fetch(`/blog/${POST_ID}`, {
+            const res  = await fetch(`/blogs/${POST_ID}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -295,10 +295,10 @@
     async function deleteBlog() {
         const title = document.querySelector('.page-title').textContent;
         if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-        const res  = await fetch(`/blog/${POST_ID}`, { method: 'DELETE' });
+        const res  = await fetch(`/blogs/${POST_ID}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
-            window.location.href = '/blog';
+            window.location.href = '/blogs';
         } else {
             alert(data.error || 'Delete failed');
         }

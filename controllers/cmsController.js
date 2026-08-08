@@ -16,6 +16,7 @@ const rd = (req, extra = {}) => ({
     userId: req.session.userId,
     userName: req.session.name,
     sidebarCollapsed: req.session.sidebarCollapsed || false,
+    currentPath: req.path,
     ...extra,
 });
 
@@ -39,10 +40,22 @@ exports.uploadImage = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ uploaded: 0, error: { message: 'No file uploaded' } });
         // CKEditor 4 uploadimage plugin expects: { uploaded: 1, fileName, url }
-        res.json({ uploaded: 1, fileName: req.file.filename || req.file.originalname, url: req.file.path });
+        res.json({ uploaded: 1, fileName: req.file.filename || req.file.originalname, url: req.file.path, publicId: req.file.filename });
     } catch (err) {
         console.error('Image upload error:', err);
         res.status(500).json({ error: { message: err.message || 'Upload failed' } });
+    }
+};
+
+exports.deleteImage = async (req, res) => {
+    try {
+        const { publicId } = req.body;
+        if (!publicId) return res.status(400).json({ error: 'publicId required' });
+        const { cloudinary } = require('../config/cloudinary');
+        await cloudinary.uploader.destroy(publicId);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -59,7 +72,7 @@ exports.getBlogPage = async (req, res) => {
                 .populate('author', 'name')
                 .populate('tags', 'name')
                 .populate('categories', 'name')
-                .sort({ publishedAt: -1, createdAt: -1 })
+                .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(LIMIT)
                 .lean(),
@@ -230,8 +243,33 @@ exports.deleteProject = async (req, res) => {
 
 exports.getTagsPage = async (req, res) => {
     try {
-        const items = await Tag.find().sort({ name: 1 }).lean();
-        res.render('cms/tags', rd(req, { items }));
+        const LIMIT = 20;
+        const page  = Math.max(1, parseInt(req.query.page) || 1);
+        const skip  = (page - 1) * LIMIT;
+        const [items, total] = await Promise.all([
+            Tag.find().sort({ name: 1 }).skip(skip).limit(LIMIT).lean(),
+            Tag.countDocuments(),
+        ]);
+        const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+        function buildPages(cur, last) {
+            if (last <= 7) return Array.from({ length: last }, (_, i) => ({ num: i + 1, active: i + 1 === cur }));
+            const pages = [];
+            const add = (n) => pages.push(n === null ? { num: null, ellipsis: true } : { num: n, active: n === cur });
+            add(1); if (cur > 3) add(null);
+            for (let i = Math.max(2, cur - 1); i <= Math.min(last - 1, cur + 1); i++) add(i);
+            if (cur < last - 2) add(null); add(last);
+            return pages;
+        }
+        res.render('cms/tags', rd(req, {
+            items,
+            pagination: {
+                page, totalPages, total,
+                hasPrev: page > 1, hasNext: page < totalPages,
+                prevPage: page - 1, nextPage: page + 1,
+                from: total ? skip + 1 : 0, to: Math.min(skip + LIMIT, total),
+                pages: buildPages(page, totalPages),
+            },
+        }));
     } catch (err) {
         res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
     }
@@ -271,8 +309,33 @@ exports.deleteTag = async (req, res) => {
 
 exports.getCategoriesPage = async (req, res) => {
     try {
-        const items = await Category.find().sort({ name: 1 }).lean();
-        res.render('cms/categories', rd(req, { items }));
+        const LIMIT = 20;
+        const page  = Math.max(1, parseInt(req.query.page) || 1);
+        const skip  = (page - 1) * LIMIT;
+        const [items, total] = await Promise.all([
+            Category.find().sort({ name: 1 }).skip(skip).limit(LIMIT).lean(),
+            Category.countDocuments(),
+        ]);
+        const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+        function buildPages(cur, last) {
+            if (last <= 7) return Array.from({ length: last }, (_, i) => ({ num: i + 1, active: i + 1 === cur }));
+            const pages = [];
+            const add = (n) => pages.push(n === null ? { num: null, ellipsis: true } : { num: n, active: n === cur });
+            add(1); if (cur > 3) add(null);
+            for (let i = Math.max(2, cur - 1); i <= Math.min(last - 1, cur + 1); i++) add(i);
+            if (cur < last - 2) add(null); add(last);
+            return pages;
+        }
+        res.render('cms/categories', rd(req, {
+            items,
+            pagination: {
+                page, totalPages, total,
+                hasPrev: page > 1, hasNext: page < totalPages,
+                prevPage: page - 1, nextPage: page + 1,
+                from: total ? skip + 1 : 0, to: Math.min(skip + LIMIT, total),
+                pages: buildPages(page, totalPages),
+            },
+        }));
     } catch (err) {
         res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
     }
@@ -314,13 +377,40 @@ exports.deleteCategory = async (req, res) => {
 
 exports.getSubscribersPage = async (req, res) => {
     try {
-        const items = await Subscriber.find().sort({ subscribedAt: -1 });
-        const counts = {
-            total: items.length,
-            active: items.filter(s => s.status === 'active').length,
-            unsubscribed: items.filter(s => s.status === 'unsubscribed').length,
-        };
-        res.render('cms/subscribers', rd(req, { items, counts }));
+        const LIMIT = 20;
+        const page  = Math.max(1, parseInt(req.query.page) || 1);
+        const skip  = (page - 1) * LIMIT;
+
+        const [items, total, activeCount, unsubscribedCount] = await Promise.all([
+            Subscriber.find().sort({ subscribedAt: -1 }).skip(skip).limit(LIMIT).lean(),
+            Subscriber.countDocuments(),
+            Subscriber.countDocuments({ status: 'active' }),
+            Subscriber.countDocuments({ status: 'unsubscribed' }),
+        ]);
+
+        const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+        function buildPages(cur, last) {
+            if (last <= 7) return Array.from({ length: last }, (_, i) => ({ num: i + 1, active: i + 1 === cur }));
+            const pages = [];
+            const add = (n) => pages.push(n === null ? { num: null, ellipsis: true } : { num: n, active: n === cur });
+            add(1); if (cur > 3) add(null);
+            for (let i = Math.max(2, cur - 1); i <= Math.min(last - 1, cur + 1); i++) add(i);
+            if (cur < last - 2) add(null); add(last);
+            return pages;
+        }
+
+        const counts = { total, active: activeCount, unsubscribed: unsubscribedCount };
+        res.render('cms/subscribers', rd(req, {
+            items,
+            counts,
+            pagination: {
+                page, totalPages, total,
+                hasPrev: page > 1, hasNext: page < totalPages,
+                prevPage: page - 1, nextPage: page + 1,
+                from: total ? skip + 1 : 0, to: Math.min(skip + LIMIT, total),
+                pages: buildPages(page, totalPages),
+            },
+        }));
     } catch (err) {
         res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
     }
@@ -362,8 +452,36 @@ exports.deleteSubscriber = async (req, res) => {
 
 exports.getNewslettersPage = async (req, res) => {
     try {
-        const items = await Newsletter.find().sort({ createdAt: -1 });
-        res.render('cms/newsletters', rd(req, { items }));
+        const LIMIT = 12;
+        const page  = Math.max(1, parseInt(req.query.page) || 1);
+        const skip  = (page - 1) * LIMIT;
+
+        const [items, total] = await Promise.all([
+            Newsletter.find().sort({ createdAt: -1 }).skip(skip).limit(LIMIT).lean(),
+            Newsletter.countDocuments(),
+        ]);
+
+        const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+        function buildPages(cur, last) {
+            if (last <= 7) return Array.from({ length: last }, (_, i) => ({ num: i + 1, active: i + 1 === cur }));
+            const pages = [];
+            const add = (n) => pages.push(n === null ? { num: null, ellipsis: true } : { num: n, active: n === cur });
+            add(1); if (cur > 3) add(null);
+            for (let i = Math.max(2, cur - 1); i <= Math.min(last - 1, cur + 1); i++) add(i);
+            if (cur < last - 2) add(null); add(last);
+            return pages;
+        }
+
+        res.render('cms/newsletters', rd(req, {
+            items,
+            pagination: {
+                page, totalPages, total,
+                hasPrev: page > 1, hasNext: page < totalPages,
+                prevPage: page - 1, nextPage: page + 1,
+                from: total ? skip + 1 : 0, to: Math.min(skip + LIMIT, total),
+                pages: buildPages(page, totalPages),
+            },
+        }));
     } catch (err) {
         res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
     }

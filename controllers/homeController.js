@@ -41,6 +41,7 @@ exports.getDashboard = async (req, res) => {
             userId: req.session.userId,
             userName: req.session.name,
             sidebarCollapsed: req.session.sidebarCollapsed || false,
+            currentPath: req.path,
             stats: {
                 blogTotal, blogPublished,
                 projectTotal, projectPublished,

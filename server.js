@@ -1,6 +1,8 @@
+const dotenv = require("dotenv")
+dotenv.config()
+
 const express = require("express")
 const exphbs = require("express-handlebars")
-const dotenv = require("dotenv")
 const connectDB = require("./config/db")
 const authRoutes = require("./routes/authRoutes")
 const homeRoutes = require("./routes/homeRoutes")
@@ -10,7 +12,6 @@ const MongoStore = require("connect-mongo");
 const path = require('path');
 const hbsHelpers = require('./modules/helpers');
 
-dotenv.config()
 connectDB()
 
 const app = express();
@@ -46,6 +47,7 @@ app.use(authRoutes);
 app.use(homeRoutes);
 app.use(cmsRoutes);
 
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000")
+const PORT = process.env.ADMIN_PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`)
 })

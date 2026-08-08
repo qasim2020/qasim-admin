@@ -69,7 +69,7 @@
 
 <!-- Top bar -->
 <div id="editor-bar">
-    <a href="/blog/{{item._id}}/view" class="btn btn-sm btn-ghost-secondary" title="Back to post">
+    <a href="/blogs/{{item._id}}/view" class="btn btn-sm btn-ghost-secondary" title="Back to post">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6"></polyline>
@@ -87,13 +87,14 @@
 
 <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
-    const POST_ID = '{{item._id}}';
+    const POST_ID  = '{{item._id}}';
+    const BASE_URL  = '/blogs';
     const saveStatus = document.getElementById('save-status');
 
     const editor = CKEDITOR.replace('editor-content', {
         height: '100%',
-        uploadUrl: '/blog/upload-image',
-        filebrowserUploadUrl: '/blog/upload-image',
+        uploadUrl: '/blogs/upload-image',
+        filebrowserUploadUrl: '/blogs/upload-image',
         removePlugins: 'exportpdf,exportword,uploadimage',
         resize_enabled: false,
         versionCheck: false,
@@ -126,10 +127,7 @@
         saveStatus.textContent = 'Saving…';
         saveStatus.className = 'saving';
         try {
-            const res = await fetch('/blog/' + POST_ID, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: editor.getData() }),
+            const res = await fetch('/blogs/' + POST_ID, {
             });
             const data = await res.json();
             if (data.success) {
@@ -179,10 +177,7 @@
             saveStatus.textContent = 'Autosaving…';
             saveStatus.className = 'saving';
             try {
-                const res = await fetch('/blog/' + POST_ID, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: current }),
+                const res = await fetch('/blogs/' + POST_ID, {
                 });
                 const data = await res.json();
                 if (data.success) {
