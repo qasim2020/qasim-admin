@@ -46,9 +46,14 @@ router.delete('/subscribers/:id', requireLogin, cms.deleteSubscriber);
 
 // ─── Newsletters ──────────────────────────────────────────────────────────────
 router.get('/newsletters', requireLogin, cms.getNewslettersPage);
+router.get('/newsletters/new', requireLogin, cms.getNewsletterNew);
 router.post('/newsletters', requireLogin, cms.createNewsletter);
+router.get('/newsletters/recipients', requireLogin, cms.getNewsletterRecipients);
+router.get('/newsletters/:id/edit', requireLogin, cms.getNewsletterEdit);
+router.get('/newsletters/:id/view', requireLogin, cms.getNewsletterViewPage);
 router.get('/newsletters/:id', requireLogin, cms.getNewsletter);
 router.put('/newsletters/:id', requireLogin, cms.updateNewsletter);
+router.post('/newsletters/:id/send', requireLogin, cms.sendNewsletter);
 router.delete('/newsletters/:id', requireLogin, cms.deleteNewsletter);
 
 // ─── Work Experience ──────────────────────────────────────────────────────────

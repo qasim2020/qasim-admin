@@ -13,4 +13,7 @@ router.get("/", (req, res) => {
 router.get("/dashboard", requireLogin, homeController.getDashboard);
 router.post('/toggleSidebar', requireLogin, homeController.toggleSideBar);
 
+// Public one-click unsubscribe (no login)
+router.get('/unsubscribe/:token', homeController.unsubscribe);
+
 module.exports = router;

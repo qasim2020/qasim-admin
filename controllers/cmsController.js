@@ -8,7 +8,7 @@ const WorkExperience = require('../models/WorkExperience');
 const Skill = require('../models/Skill');
 const SiteSettings = require('../models/SiteSettings');
 const Testimonial = require('../models/Testimonial');
-const { sendEmail } = require('../config/resend');
+const { sendEmail, sendBatch } = require('../config/resend');
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
 
@@ -487,9 +487,65 @@ exports.getNewslettersPage = async (req, res) => {
     }
 };
 
+// Compose page — new campaign
+exports.getNewsletterNew = async (req, res) => {
+    try {
+        const activeCount = await Subscriber.countDocuments({ status: 'active' });
+        res.render('cms/newsletter-editor', rd(req, {
+            item: null,
+            isNew: true,
+            activeCount,
+            title: 'New Campaign',
+        }));
+    } catch (err) {
+        res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
+    }
+};
+
+// Compose page — edit an existing draft (sent campaigns are locked, redirect to view)
+exports.getNewsletterEdit = async (req, res) => {
+    try {
+        const item = await Newsletter.findById(req.params.id).lean();
+        if (!item) {
+            return res.status(404).render('error', { layout: 'auth', heading: 'Not found', error: 'Campaign not found.' });
+        }
+        if (item.status === 'sent') {
+            return res.redirect(`/newsletters/${item._id}/view`);
+        }
+        const activeCount = await Subscriber.countDocuments({ status: 'active' });
+        res.render('cms/newsletter-editor', rd(req, {
+            item,
+            isNew: false,
+            activeCount,
+            title: item.title,
+        }));
+    } catch (err) {
+        res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
+    }
+};
+
+// Read-only view page
+exports.getNewsletterViewPage = async (req, res) => {
+    try {
+        const item = await Newsletter.findById(req.params.id).lean();
+        if (!item) {
+            return res.status(404).render('error', { layout: 'auth', heading: 'Not found', error: 'Campaign not found.' });
+        }
+        res.render('cms/newsletter-view', rd(req, { item, title: item.title }));
+    } catch (err) {
+        res.status(500).render('error', { layout: 'auth', heading: 'Error', error: err });
+    }
+};
+
+
 exports.createNewsletter = async (req, res) => {
     try {
-        const item = await Newsletter.create(req.body);
+        const data = { ...req.body };
+        // New campaigns always start as drafts; sending is explicit via /send.
+        data.status = 'draft';
+        delete data.sentAt;
+        delete data.recipientCount;
+        const item = await Newsletter.create(data);
         res.json({ success: true, item });
     } catch (err) { errResponse(res, err); }
 };
@@ -507,29 +563,11 @@ exports.updateNewsletter = async (req, res) => {
         const existing = await Newsletter.findById(req.params.id);
         if (!existing) return res.status(404).json({ error: 'Not found' });
 
+        // Content edits only — sending is handled by the dedicated /send endpoint.
         const data = { ...req.body };
-        const isSending = data.status === 'sent' && existing.status !== 'sent';
-
-        if (isSending) {
-            const subscribers = await Subscriber.find({ status: 'active' });
-            if (subscribers.length === 0) {
-                return res.status(400).json({ error: 'No active subscribers to send to.' });
-            }
-            const html = data.bodyHtml || `<h1>${data.subject || existing.subject}</h1>`;
-            const subject = data.subject || existing.subject;
-
-            // Send to all active subscribers; log failures but don't abort
-            const results = await Promise.allSettled(
-                subscribers.map(sub =>
-                    sendEmail({ to: sub.email, subject, html })
-                )
-            );
-            const failed = results.filter(r => r.status === 'rejected').length;
-            if (failed > 0) console.warn(`Newsletter send: ${failed} failed out of ${subscribers.length}`);
-
-            data.sentAt = new Date();
-            data.recipientCount = subscribers.length;
-        }
+        delete data.status;
+        delete data.sentAt;
+        delete data.recipientCount;
 
         const item = await Newsletter.findByIdAndUpdate(req.params.id, data, { new: true });
         res.json({ success: true, item });
@@ -542,6 +580,90 @@ exports.deleteNewsletter = async (req, res) => {
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 };
+
+// Active subscribers for the campaign recipient picker
+exports.getNewsletterRecipients = async (req, res) => {
+    try {
+        const subs = await Subscriber.find({ status: 'active' })
+            .select('email name')
+            .sort({ email: 1 })
+            .lean();
+        res.json(subs);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+};
+
+// Compose the final HTML for one recipient, including an unsubscribe footer.
+function buildCampaignHtml(newsletter, subscriber) {
+    const body = newsletter.bodyHtml && newsletter.bodyHtml.trim()
+        ? newsletter.bodyHtml
+        : `<h1>${newsletter.subject || ''}</h1>`;
+
+    const base = process.env.PORTFOLIO_URL;
+    if (!base || !subscriber.unsubscribeToken) return body;
+
+    const url = `${base.replace(/\/+$/, '')}/unsubscribe/${subscriber.unsubscribeToken}`;
+    const footer = `
+<hr style="margin-top:32px;border:none;border-top:1px solid #e5e5e5">
+<p style="font-size:12px;color:#888;text-align:center;margin-top:16px">
+  You're receiving this because you subscribed.
+  <a href="${url}" style="color:#888">Unsubscribe</a>.
+</p>`;
+    return body + footer;
+}
+
+// Send a campaign to all active subscribers, or to a single chosen subscriber.
+exports.sendNewsletter = async (req, res) => {
+    try {
+        const newsletter = await Newsletter.findById(req.params.id);
+        if (!newsletter) return res.status(404).json({ error: 'Not found' });
+
+        const mode = req.body.mode === 'single' ? 'single' : 'all';
+        const subject = newsletter.subject;
+
+        if (mode === 'single') {
+            const subscriber = await Subscriber.findById(req.body.subscriberId);
+            if (!subscriber) return res.status(404).json({ error: 'Subscriber not found' });
+            if (subscriber.status !== 'active') {
+                return res.status(400).json({ error: 'That subscriber is not active.' });
+            }
+            await sendEmail({
+                to: subscriber.email,
+                subject,
+                html: buildCampaignHtml(newsletter, subscriber),
+            });
+            return res.json({ success: true, mode, sent: 1 });
+        }
+
+        // mode === 'all'
+        if (newsletter.status === 'sent') {
+            return res.status(400).json({ error: 'This campaign has already been sent.' });
+        }
+
+        const subscribers = await Subscriber.find({ status: 'active' });
+        if (subscribers.length === 0) {
+            return res.status(400).json({ error: 'No active subscribers to send to.' });
+        }
+
+        const messages = subscribers.map((sub) => ({
+            to: sub.email,
+            subject,
+            html: buildCampaignHtml(newsletter, sub),
+        }));
+
+        const { sent, failed } = await sendBatch(messages);
+        if (failed > 0) {
+            console.warn(`Newsletter ${newsletter._id}: ${failed} failed out of ${subscribers.length}`);
+        }
+
+        newsletter.status = 'sent';
+        newsletter.sentAt = new Date();
+        newsletter.recipientCount = subscribers.length;
+        await newsletter.save();
+
+        res.json({ success: true, mode, sent, failed });
+    } catch (err) { errResponse(res, err); }
+};
+
 
 // ─── Work Experience ──────────────────────────────────────────────────────────
 

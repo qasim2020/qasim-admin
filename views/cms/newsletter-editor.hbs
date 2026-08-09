@@ -1,0 +1,268 @@
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="mb-1">
+                    <a href="/newsletters" class="text-secondary small">← All campaigns</a>
+                </div>
+                <h2 class="page-title">{{#if isNew}}New Campaign{{else}}Edit Campaign{{/if}}</h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <a href="/newsletters" class="btn btn-link text-secondary">Cancel</a>
+                    <button type="button" class="btn btn-outline-primary" id="save-btn" onclick="saveDraft()">Save Draft</button>
+                    <button type="button" class="btn btn-primary" id="send-btn" onclick="sendCampaign()">Send Campaign</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div id="form-error" class="alert alert-danger d-none mb-3"></div>
+        <div id="form-feedback" class="alert alert-success d-none mb-3"></div>
+
+        <form id="item-form" onsubmit="saveDraft(event)">
+            <input type="hidden" id="item-id" value="{{item._id}}">
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label required">Title</label>
+                                <input type="text" class="form-control" id="field-title"
+                                    placeholder="Internal campaign name" value="{{item.title}}">
+                                <small class="form-hint">Used to identify this campaign in the list. Not shown to subscribers.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Subject</label>
+                                <input type="text" class="form-control" id="field-subject"
+                                    placeholder="Email subject line" value="{{item.subject}}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Preview text</label>
+                                <input type="text" class="form-control" id="field-preview-text"
+                                    placeholder="Short summary shown in the inbox preview" value="{{item.previewText}}">
+                            </div>
+                            <div class="mb-1">
+                                <label class="form-label">Body</label>
+                                <textarea id="field-body-html">{{item.bodyHtml}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recipients</h3>
+                        </div>
+                        <div class="card-body">
+                            <label class="form-check">
+                                <input class="form-check-input" type="radio" name="recipient-mode" id="mode-all"
+                                    value="all" checked onchange="onRecipientModeChange()">
+                                <span class="form-check-label">
+                                    All active subscribers
+                                    <span class="text-secondary">(<span id="active-count">{{activeCount}}</span>)</span>
+                                </span>
+                            </label>
+                            <label class="form-check">
+                                <input class="form-check-input" type="radio" name="recipient-mode" id="mode-single"
+                                    value="single" onchange="onRecipientModeChange()">
+                                <span class="form-check-label">A single subscriber</span>
+                            </label>
+                            <div id="single-recipient-wrap" class="mt-2 d-none">
+                                <select id="field-subscriber" placeholder="Search subscribers…"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{#unless isNew}}
+                    <div class="card mt-3">
+                        <div class="card-body text-secondary small">
+                            {{#if (eq item.status 'sent')}}
+                            <div class="mb-1"><span class="badge bg-success-lt">Sent</span></div>
+                            Sent {{formatDate item.sentAt}} to {{item.recipientCount}} recipient(s).
+                            {{else}}
+                            <span class="badge bg-secondary-lt">Draft</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{/unless}}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2/dist/js/tom-select.complete.min.js"></script>
+<script>
+(function () {
+    var _editor = null;
+    var _tomSelect = null;
+
+    // ── CKEditor ─────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        _editor = CKEDITOR.replace('field-body-html', {
+            height: 450,
+            uploadUrl: '/blogs/upload-image',
+            filebrowserUploadUrl: '/blogs/upload-image',
+            filebrowserImageUploadUrl: '/blogs/upload-image',
+            removePlugins: 'exportpdf,exportword,uploadimage',
+            resize_enabled: true,
+            versionCheck: false,
+            contentsCss: ['/static/blog-editor-content.css'],
+            toolbar: [
+                { name: 'undo',        items: ['Undo', 'Redo'] },
+                { name: 'source',      items: ['Source'] },
+                { name: 'styles',      items: ['Format', 'Font', 'FontSize'] },
+                { name: 'colors',      items: ['TextColor', 'BGColor'] },
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+                { name: 'paragraph',   items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                { name: 'insert',      items: ['Image', 'Table', 'HorizontalRule', 'Link', 'Unlink', 'SpecialChar'] },
+            ],
+        });
+    });
+
+    // ── Recipients ───────────────────────────────────────────────────────────
+    window.onRecipientModeChange = function () {
+        var wrap = document.getElementById('single-recipient-wrap');
+        if (_getRecipientMode() === 'single') {
+            wrap.classList.remove('d-none');
+            _loadRecipients();
+        } else {
+            wrap.classList.add('d-none');
+        }
+    };
+
+    function _getRecipientMode() {
+        return document.querySelector('input[name="recipient-mode"]:checked').value;
+    }
+
+    async function _loadRecipients() {
+        if (_tomSelect) { _tomSelect.open(); return; }
+        var select = document.getElementById('field-subscriber');
+        var opts = [];
+        try {
+            var res = await fetch('/newsletters/recipients');
+            if (res.ok) {
+                var data = await res.json();
+                opts = (data.items || data).map(function (s) {
+                    return {
+                        _id: s._id,
+                        email: s.email,
+                        name: s.name || '',
+                        label: s.name ? (s.name + ' <' + s.email + '>') : s.email,
+                    };
+                });
+            }
+        } catch (e) { /* ignore */ }
+
+        _tomSelect = new TomSelect(select, {
+            valueField: '_id',
+            labelField: 'label',
+            searchField: ['label', 'email', 'name'],
+            options: opts,
+            maxOptions: 1000,
+            openOnFocus: true,
+            placeholder: 'Search subscribers\u2026',
+        });
+        _tomSelect.open();
+        _tomSelect.focus();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function _showError(msg) {
+        var el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function _clearError() {
+        document.getElementById('form-error').classList.add('d-none');
+    }
+
+    function _collect() {
+        return {
+            title: document.getElementById('field-title').value.trim(),
+            subject: document.getElementById('field-subject').value.trim(),
+            previewText: document.getElementById('field-preview-text').value.trim(),
+            bodyHtml: _editor ? _editor.getData() : '',
+        };
+    }
+
+    async function _persist() {
+        var data = _collect();
+        if (!data.title) { _showError('Title is required.'); return null; }
+        if (!data.subject) { _showError('Subject is required.'); return null; }
+
+        var id = document.getElementById('item-id').value;
+        var url = id ? ('/newsletters/' + id) : '/newsletters';
+        var method = id ? 'PUT' : 'POST';
+
+        var res = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) { _showError('Failed to save campaign.'); return null; }
+
+        var json = await res.json();
+        var newId = (json.item && json.item._id) || id;
+        if (newId) document.getElementById('item-id').value = newId;
+        return newId;
+    }
+
+    // ── Public API (called by onclick attributes) ─────────────────────────────
+    window.saveDraft = async function (e) {
+        if (e) e.preventDefault();
+        _clearError();
+        var btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        var id = await _persist();
+        btn.disabled = false;
+        if (id) window.location.href = '/newsletters/' + id + '/edit';
+    };
+
+    window.sendCampaign = async function () {
+        _clearError();
+        var mode = _getRecipientMode();
+        var subscriberId = null;
+        if (mode === 'single') {
+            subscriberId = _tomSelect ? _tomSelect.getValue() : '';
+            if (!subscriberId) { _showError('Select a subscriber to send to.'); return; }
+        } else {
+            var count = parseInt(document.getElementById('active-count').textContent) || 0;
+            if (!count) { _showError('There are no active subscribers to send to.'); return; }
+            if (!confirm('Send this campaign to all ' + count + ' active subscribers? This cannot be undone.')) return;
+        }
+
+        var sendBtn = document.getElementById('send-btn');
+        sendBtn.disabled = true;
+
+        var id = await _persist();
+        if (!id) { sendBtn.disabled = false; return; }
+
+        try {
+            var res = await fetch('/newsletters/' + id + '/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode: mode, subscriberId: subscriberId }),
+            });
+            var json = await res.json().catch(function () { return {}; });
+            if (!res.ok || json.success === false) {
+                throw new Error(json.error || 'Failed to send campaign.');
+            }
+            window.location.href = '/newsletters/' + id + '/view';
+        } catch (err) {
+            _showError(err.message || 'Failed to send campaign.');
+            sendBtn.disabled = false;
+        }
+    };
+})();
+</script>

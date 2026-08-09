@@ -59,3 +59,38 @@ exports.getDashboard = async (req, res) => {
         });
     }
 };
+
+// Public: one-click unsubscribe via token embedded in campaign emails.
+exports.unsubscribe = async (req, res) => {
+    try {
+        const subscriber = await Subscriber.findOne({ unsubscribeToken: req.params.token });
+
+        if (!subscriber) {
+            return res.status(404).render('error', {
+                layout: 'auth',
+                heading: 'Link not found',
+                error: 'This unsubscribe link is invalid or has expired.',
+            });
+        }
+
+        if (subscriber.status !== 'unsubscribed') {
+            subscriber.status = 'unsubscribed';
+            subscriber.unsubscribedAt = new Date();
+            await subscriber.save();
+        }
+
+        res.render('error', {
+            layout: 'auth',
+            success: true,
+            heading: 'You have been unsubscribed',
+            message: `${subscriber.email} will no longer receive newsletter emails.`,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).render('error', {
+            layout: 'auth',
+            heading: 'Server error',
+            error: 'Something went wrong. Please try again later.',
+        });
+    }
+};

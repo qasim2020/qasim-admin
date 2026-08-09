@@ -128,6 +128,9 @@
         saveStatus.className = 'saving';
         try {
             const res = await fetch('/blogs/' + POST_ID, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: editor.getData() }),
             });
             const data = await res.json();
             if (data.success) {
@@ -178,6 +181,9 @@
             saveStatus.className = 'saving';
             try {
                 const res = await fetch('/blogs/' + POST_ID, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: editor.getData() }),
                 });
                 const data = await res.json();
                 if (data.success) {

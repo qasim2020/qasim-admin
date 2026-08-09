@@ -1,0 +1,95 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="mb-1">
+                    <a href="/newsletters" class="text-secondary small">← All campaigns</a>
+                </div>
+                <h2 class="page-title">{{item.title}}</h2>
+                <div class="text-secondary mt-1 d-flex flex-wrap gap-2 align-items-center">
+                    {{#if (eq item.status 'sent')}}
+                    <span class="badge bg-success-lt">Sent</span>
+                    <span class="text-muted">·</span>
+                    <span>Sent {{formatDate item.sentAt}}</span>
+                    <span class="text-muted">·</span>
+                    <span>{{item.recipientCount}} recipient{{#if (neq item.recipientCount 1)}}s{{/if}}</span>
+                    {{else}}
+                    <span class="badge bg-secondary-lt">Draft</span>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    {{#unless (eq item.status 'sent')}}
+                    <a href="/newsletters/{{item._id}}/edit" class="btn btn-primary">Edit</a>
+                    {{/unless}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-secondary small text-uppercase mb-1">Subject</div>
+                        <div class="fw-medium mb-3">{{item.subject}}</div>
+                        {{#if item.previewText}}
+                        <div class="text-secondary small text-uppercase mb-1">Preview text</div>
+                        <div class="text-secondary mb-3">{{item.previewText}}</div>
+                        {{/if}}
+                        <hr>
+                        <div class="blog-content">
+                            {{{item.bodyHtml}}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Details</h3>
+                    </div>
+                    <div class="card-body text-secondary small">
+                        <div class="mb-2">
+                            <div class="text-uppercase">Status</div>
+                            {{#if (eq item.status 'sent')}}
+                            <span class="badge bg-success-lt">Sent</span>
+                            {{else}}
+                            <span class="badge bg-secondary-lt">Draft</span>
+                            {{/if}}
+                        </div>
+                        {{#if (eq item.status 'sent')}}
+                        <div class="mb-2">
+                            <div class="text-uppercase">Sent at</div>
+                            {{formatDate item.sentAt}}
+                        </div>
+                        <div class="mb-2">
+                            <div class="text-uppercase">Recipients</div>
+                            {{item.recipientCount}}
+                        </div>
+                        {{/if}}
+                        <div class="mb-2">
+                            <div class="text-uppercase">Created</div>
+                            {{formatDate item.createdAt}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .blog-content { font-size: 1.05rem; line-height: 1.8; }
+    .blog-content h1, .blog-content h2, .blog-content h3,
+    .blog-content h4, .blog-content h5, .blog-content h6 { margin-top: 1.5rem; margin-bottom: .75rem; }
+    .blog-content p { margin-bottom: 1rem; }
+    .blog-content img { max-width: 100%; height: auto; display: block; margin: 1rem auto; }
+    .blog-content pre { background: #f4f6fa; border-radius: .375rem; padding: 1rem; overflow-x: auto; }
+    .blog-content blockquote { border-left: 4px solid #f59f00; padding-left: 1rem; color: #666; }
+    .blog-content ul, .blog-content ol { padding-left: 1.5rem; }
+</style>
