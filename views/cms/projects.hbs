@@ -136,6 +136,11 @@
                             <textarea id="field-content" class="form-control" rows="6"
                                 placeholder="Detailed project description…"></textarea>
                         </div>
+                        <style>
+                            /* Let CKEditor dialogs (Image, Link) sit above the Bootstrap modal */
+                            .cke_dialog { z-index: 100000 !important; }
+                            .cke_dialog_background_cover { z-index: 99999 !important; }
+                        </style>
                         <div class="col-12">
                             <label class="form-label">Tech Stack <span class="text-secondary">(comma-separated)</span></label>
                             <input type="text" id="field-tech-stack" class="form-control"
@@ -185,10 +190,48 @@
     </div>
 </div>
 
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     const BASE_URL   = '/projects';
     const UPLOAD_URL = '/projects/upload-image';
     const DELETE_URL = '/blogs/delete-image';
+
+    // ── Full Content rich-text editor ─────────────────────────────────────────
+    let contentEditor = null;
+    CKEDITOR.replace('field-content', {
+        height: 320,
+        uploadUrl: UPLOAD_URL,
+        filebrowserUploadUrl: UPLOAD_URL,
+        removePlugins: 'exportpdf,exportword,uploadimage',
+        resize_enabled: false,
+        versionCheck: false,
+        contentsCss: ['/static/blog-editor-content.css'],
+        toolbar: [
+            { name: 'undo',        items: ['Undo', 'Redo'] },
+            { name: 'source',      items: ['Source'] },
+            { name: 'styles',      items: ['Format', 'Font', 'FontSize'] },
+            { name: 'colors',      items: ['TextColor', 'BGColor'] },
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+            { name: 'paragraph',   items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+            { name: 'insert',      items: ['Image', 'Table', 'HorizontalRule', 'Link', 'Unlink', 'SpecialChar'] },
+        ],
+    });
+    CKEDITOR.on('instanceReady', function (evt) {
+        if (evt.editor.name === 'field-content') contentEditor = evt.editor;
+    });
+    // Bootstrap's modal focus-trap blocks typing in CKEditor dialogs — let them through
+    document.addEventListener('focusin', function (e) {
+        if (e.target.closest('.cke_dialog, .cke_dialog_background_cover')) {
+            e.stopImmediatePropagation();
+        }
+    });
+    function setContent(html) {
+        if (contentEditor) contentEditor.setData(html || '');
+        else document.getElementById('field-content').value = html || '';
+    }
+    function getContent() {
+        return contentEditor ? contentEditor.getData() : document.getElementById('field-content').value;
+    }
 
     function slugify(str) {
         return str.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -206,6 +249,7 @@
         document.getElementById('modal-title').textContent = 'New Project';
         document.getElementById('item-id').value = '';
         document.getElementById('item-form').reset();
+        setContent('');
         document.getElementById('field-slug').dataset.manual = '';
         document.getElementById('field-order').value = '0';
         document.getElementById('form-error').classList.add('d-none');
@@ -223,7 +267,7 @@
             document.getElementById('field-slug').value = data.slug || '';
             document.getElementById('field-slug').dataset.manual = 'true';
             document.getElementById('field-description').value = data.description || '';
-            document.getElementById('field-content').value = data.content || '';
+            setContent(data.content || '');
             document.getElementById('field-tech-stack').value = (data.techStack || []).join(', ');
             document.getElementById('field-cover-image').value = data.coverImage || '';
             coverSetPreview(data.coverImage || '', '');
@@ -255,7 +299,7 @@
                 title: document.getElementById('field-title').value.trim(),
                 slug: document.getElementById('field-slug').value.trim(),
                 description: document.getElementById('field-description').value.trim(),
-                content: document.getElementById('field-content').value.trim(),
+                content: getContent().trim(),
                 techStack: document.getElementById('field-tech-stack').value.trim(),
                 coverImage: document.getElementById('field-cover-image').value.trim(),
                 githubUrl: document.getElementById('field-github-url').value.trim(),

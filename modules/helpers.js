@@ -16,6 +16,10 @@ const and = function(a,b) {
     return a && b;
 }
 
+const not = function (a) {
+    return !a;
+};
+
 const compareIds = function (a, b) {
     if (!a || !b) return false;
     return a.toString() === b.toString();
@@ -230,6 +234,7 @@ module.exports = {
     eq,
     gt,
     and,
+    not,
     compareIds,
     inc,
     dec,
